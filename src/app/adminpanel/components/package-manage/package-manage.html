@@ -1,0 +1,150 @@
+<div class="manage-container animate-fade-in">
+  <div class="header-section flex-header">
+    <div>
+      <h3>باقات العروض والأسعار</h3>
+      <p>إدارة باقات الخدمات والأسعار والميزات المرفقة بكل باقة</p>
+    </div>
+    <button (click)="openAddForm()" class="btn-primary-sm">
+      <i class="bi bi-plus-lg"></i> إضافة باقة جديدة
+    </button>
+  </div>
+
+  <!-- Banners -->
+  <div *ngIf="successMessage" class="alert-success animate-fade-in">
+    <i class="bi bi-check-circle-fill"></i> {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="alert-error animate-fade-in">
+    <i class="bi bi-exclamation-triangle-fill"></i> {{ errorMessage }}
+  </div>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <span>جاري تحميل الباقات...</span>
+  </div>
+
+  <!-- Table List -->
+  <div *ngIf="!isLoading" class="table-card">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width: 80px;">الصورة</th>
+          <th>اسم الباقة</th>
+          <th>السعر</th>
+          <th>الوصف</th>
+          <th style="text-align: center;">الميزات</th>
+          <th style="width: 150px; text-align: center;">العمليات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pkg of packages">
+          <td>
+            <div class="table-img-wrapper">
+              <img [src]="pkg.imageUrl || 'assets/placeholder-package.png'" alt="Package Image" class="table-thumb" />
+            </div>
+          </td>
+          <td class="font-bold text-white">{{ pkg.name }}</td>
+          <td><span class="price-badge">{{ pkg.price }} $</span></td>
+          <td class="text-desc text-truncate">{{ pkg.description || 'لا يوجد وصف' }}</td>
+          <td style="text-align: center;">
+            <span class="feature-count-badge">
+              {{ pkg.features?.length || 0 }} ميزات
+            </span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button (click)="openEditForm(pkg)" class="btn-action edit" title="تعديل">
+                <i class="bi bi-pencil-square"></i>
+              </button>
+              <button (click)="deletePackage(pkg.id)" class="btn-action delete" title="حذف">
+                <i class="bi bi-trash-fill"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="packages.length === 0">
+          <td colspan="6" class="empty-row">لا توجد باقات حالياً. قم بإضافة باقة جديدة.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal Form Backdrop -->
+  <div *ngIf="isFormOpen" class="modal-backdrop animate-fade-in">
+    <div class="modal-card wide-modal">
+      <div class="modal-header">
+        <h4>{{ formTitle }}</h4>
+        <button (click)="closeForm()" class="btn-close"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <form (ngSubmit)="onSubmit()">
+        <div class="modal-body scrollable-body">
+          <div class="two-col-grid">
+            <div class="form-group">
+              <label for="pkgName">اسم الباقة *</label>
+              <input type="text" id="pkgName" [(ngModel)]="name" name="name" required placeholder="مثال: الباقة الأساسية" />
+            </div>
+
+            <div class="form-group">
+              <label for="pkgPrice">السعر *</label>
+              <input type="number" id="pkgPrice" [(ngModel)]="price" name="price" required placeholder="مثال: 1500" />
+            </div>
+          </div>
+
+          <div class="two-col-grid">
+            <div class="form-group">
+              <label for="pkgDesc">الوصف</label>
+              <textarea id="pkgDesc" [(ngModel)]="description" name="description" rows="3" placeholder="اكتب وصفاً أو نبذة عن الباقة..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>صورة الباقة</label>
+              <div class="image-uploader">
+                <div *ngIf="imagePreview" class="preview-box">
+                  <img [src]="imagePreview" alt="Preview" class="preview-img" />
+                </div>
+                <label class="btn-file-select">
+                  <i class="bi bi-upload"></i> اختر صورة
+                  <input type="file" (change)="onImageSelected($event)" accept="image/*" style="display: none;" />
+                </label>
+                <span *ngIf="selectedImage" class="file-chosen-text">{{ selectedImage.name }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Features Section -->
+          <div class="features-section">
+            <div class="section-title-row">
+              <h5>ميزات الباقة</h5>
+              <button type="button" (click)="addFeatureInput()" class="btn-secondary-sm">
+                <i class="bi bi-plus-lg"></i> إضافة ميزة
+              </button>
+            </div>
+            
+            <div class="features-inputs-list">
+              <div *ngFor="let feat of featuresList; let idx = index; trackBy: trackByIndex" class="feature-input-row animate-fade-in">
+                <input 
+                  type="text" 
+                  [(ngModel)]="featuresList[idx]" 
+                  name="feature_{{idx}}" 
+                  placeholder="مثال: استضافة مجانية لمدة سنة" 
+                  required
+                />
+                <button type="button" (click)="removeFeatureInput(idx)" class="btn-delete-row" title="إزالة">
+                  <i class="bi bi-dash-circle-fill"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" (click)="closeForm()" class="btn-secondary">إلغاء</button>
+          <button type="submit" [disabled]="isSaving" class="btn-primary">
+            <span *ngIf="!isSaving">حفظ الباقة</span>
+            <span *ngIf="isSaving" class="btn-spinner"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,521 @@
+<!-- Tech Background Grid and Glow Orbs -->
+<div class="tech-grid-overlay"></div>
+<div class="tech-glow-orb orb-1"></div>
+<div class="tech-glow-orb orb-2"></div>
+<div class="tech-glow-orb orb-3"></div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     NAV
+══════════════════════════════════════════════════════════════ -->
+<nav class="navbar" [class.scrolled]="navScrolled">
+  <div class="navbar-inner">
+
+    <a class="nav-logo" (click)="scrollTo('home')">
+      <img [src]="getImageUrl(company?.logo || null, 'company')" alt="RunX Tech" class="nav-logo-img" />
+    </a>
+
+    <ul class="nav-links" [class.open]="mobileMenuOpen">
+      <li class="mobile-nav-header">
+        <div class="mobile-brand">
+          <img [src]="getImageUrl(company?.logo || null, 'company')" alt="RunX Tech" class="mobile-nav-logo d-md-none" />
+          <!-- <span class="mobile-nav-title">RUNX TECH</span> -->
+        </div>
+      </li>
+      <li><a (click)="scrollTo('services')"><span class="nav-num"></span>الخدمات</a></li>
+      <li><a (click)="scrollTo('packages')"><span class="nav-num"></span>الباقات</a></li>
+      <li><a (click)="scrollTo('projects')"><span class="nav-num"></span>مشاريعنا</a></li>
+      <li><a (click)="scrollTo('contact')"><span class="nav-num"></span>تواصل معنا</a></li>
+      
+      <li class="mobile-cta-wrap">
+        <button class="mobile-nav-cta" (click)="scrollTo('contact')">ابدأ مشروعك الآن ←</button>
+      </li>
+    </ul>
+
+    <button class="nav-cta" (click)="scrollTo('contact')">ابدأ مشروعك</button>
+
+    <button class="hamburger" (click)="toggleMobileMenu()" [class.active]="mobileMenuOpen" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+
+  </div>
+</nav>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════════════════════ -->
+<section class="hero" id="home">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-glow left"></div>
+  <div class="hero-glow right"></div>
+
+  <div class="hero-inner">
+
+    <!-- Text side -->
+    <div class="hero-text">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        حلول رقمية سريعة وعالية الأداء
+      </div>
+
+      <h1 class="hero-title">
+        Fast, High-Performance<br>
+        <span class="accent">Digital Solutions</span>
+      </h1>
+
+      <p class="hero-sub">
+        نبني مواقع وتطبيقات تقنية عالية الأداء تساعد شركتك
+        على النمو الرقمي — بسرعة واحترافية لا مثيل لها.
+      </p>
+
+      <div class="hero-btns">
+        <button class="btn-primary" (click)="scrollTo('contact')">تواصل معنا الآن</button>
+        <button class="btn-ghost"   (click)="scrollTo('packages')">عرض الباقات</button>
+      </div>
+
+      <div class="hero-stats" *ngIf="!loadingCompany && company">
+        <div class="stat">
+          <span class="stat-num">{{ company.yearsOfExperience }}+</span>
+          <span class="stat-label">سنة خبرة</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num">50+</span>
+          <span class="stat-label">مشروع منجز</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num">100%</span>
+          <span class="stat-label">رضا العملاء</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visual side -->
+    <div class="hero-visual">
+      <div class="hero-ring outer"></div>
+      <div class="hero-ring inner"></div>
+      <div class="hero-logo-circle">
+        <img [src]="getImageUrl(company?.logo || null, 'company')" alt="RunX Tech" class="hero-logo-img" />
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     COVER STRIP
+══════════════════════════════════════════════════════════════ -->
+<!-- <div class="cover-strip">
+  <img src="cover.png" alt="RunX Tech Banner" class="cover-img" />
+  <div class="cover-overlay"></div>
+  <div class="cover-text" *ngIf="company">
+    <p class="cover-vision">{{ company.vision }}</p>
+  </div>
+</div> -->
+
+<!-- ══════════════════════════════════════════════════════════════
+     ABOUT
+══════════════════════════════════════════════════════════════ -->
+<section class="about-sec" id="about" *ngIf="!loadingCompany && company">
+  <div class="sec-inner about-grid">
+
+    <div class="about-text">
+      <div class="sec-eyebrow">من نحن</div>
+      <h2 class="sec-title">{{ company.name }}</h2>
+      <p class="about-body">{{ company.about }}</p>
+
+      <div class="about-cards">
+        <div class="about-card animate-on-scroll fade-up">
+          <span class="about-card-icon">🎯</span>
+          <div>
+            <p class="about-card-title">مهمتنا</p>
+            <p class="about-card-body">{{ company.mission }}</p>
+          </div>
+        </div>
+        <div class="about-card animate-on-scroll fade-up">
+          <span class="about-card-icon">🔭</span>
+          <div>
+            <p class="about-card-title">رؤيتنا</p>
+            <p class="about-card-body">{{ company.vision }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="about-logo-wrap">
+      <img [src]="getImageUrl(company?.logo || null, 'company')" alt="RunX Tech" class="about-logo" />
+    </div> -->
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SERVICES
+══════════════════════════════════════════════════════════════ -->
+<section class="services-sec" id="services">
+  <div class="sec-inner">
+    <div class="sec-header-wrap">
+      <div class="sec-title-area">
+        <div class="sec-eyebrow">خدماتنا</div>
+        <h2 class="sec-title">ماذا نقدم لك؟</h2>
+        <p class="sec-sub">نغطي كل ما تحتاجه من تطوير برمجي وتصميم وتسويق رقمي تحت سقف واحد.</p>
+      </div>
+      <div class="nav-arrows">
+        <button type="button" class="nav-arrow-btn" (click)="scrollGrid('servicesGrid', 'prev')" aria-label="السابق">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+        <button type="button" class="nav-arrow-btn" (click)="scrollGrid('servicesGrid', 'next')" aria-label="التالي">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="skeleton-grid" *ngIf="loadingServices">
+      <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]"></div>
+    </div>
+
+    <div class="services-grid" id="servicesGrid" *ngIf="!loadingServices">
+      <div class="service-card animate-on-scroll fade-up" *ngFor="let s of services">
+        <div class="service-img-wrap">
+          <img [src]="getImageUrl(s.imageUrl, 'service', s.name)" [alt]="s.name" class="service-card-img" />
+          <div class="service-img-overlay"></div>
+          <div class="service-icon-badge">{{ getServiceIcon(s.name) }}</div>
+        </div>
+        <div class="service-body">
+          <span class="service-cat">{{ s.categoryName }}</span>
+          <h3 class="service-name">{{ s.name }}</h3>
+          <p class="service-desc">{{ s.description }}</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PACKAGES
+══════════════════════════════════════════════════════════════ -->
+<section class="packages-sec" id="packages">
+  <div class="sec-inner">
+    <div class="sec-header-wrap">
+      <div class="sec-title-area">
+        <div class="sec-eyebrow">الأسعار والباقات</div>
+        <h2 class="sec-title">اختر الباقة المناسبة</h2>
+        <p class="sec-sub">باقات مرنة مصممة لكل مرحلة من مراحل نمو عملك.</p>
+      </div>
+      <div class="nav-arrows">
+        <button type="button" class="nav-arrow-btn" (click)="scrollGrid('packagesGrid', 'prev')" aria-label="السابق">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+        <button type="button" class="nav-arrow-btn" (click)="scrollGrid('packagesGrid', 'next')" aria-label="التالي">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="skeleton-grid" *ngIf="loadingPackages">
+      <div class="skeleton-card tall" *ngFor="let i of [1,2,3]"></div>
+    </div>
+
+    <div class="packages-grid" id="packagesGrid" *ngIf="!loadingPackages">
+      <div
+        class="pkg-card animate-on-scroll fade-up"
+        *ngFor="let p of packages; let i = index"
+        [class.featured]="isFeaturedPackage(i)"
+      >
+        <!-- <div class="pkg-badge" *ngIf="isFeaturedPackage(i)">الأكثر طلباً ⭐</div> -->
+
+        <div class="pkg-img-wrap">
+          <img [src]="getImageUrl(p.imageUrl, 'package', p.name)" [alt]="p.name" class="pkg-card-img" />
+          <div class="pkg-img-overlay"></div>
+        </div>
+
+        <div class="pkg-header">
+          <h3 class="pkg-name">{{ p.name }}</h3>
+          <div class="pkg-price">
+            <span class="price-num">{{ formatPrice(p.price) }}</span>
+            <span class="price-cur">دولار</span>
+          </div>
+          <p class="pkg-desc">{{ p.description }}</p>
+        </div>
+
+        <ul class="pkg-features">
+          <li *ngFor="let f of p.features">
+            <span class="check">✓</span>
+            {{ f.title }}
+          </li>
+        </ul>
+
+        <button
+          class="pkg-btn"
+          [class.ghost]="!isFeaturedPackage(i)"
+          (click)="scrollTo('contact')"
+        >
+          اختر هذه الباقة
+        </button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PROJECTS
+══════════════════════════════════════════════════════════════ -->
+<section class="projects-sec" id="projects">
+  <div class="sec-inner">
+    <div class="sec-header-wrap">
+      <div class="sec-title-area">
+        <div class="sec-eyebrow">أعمالنا</div>
+        <h2 class="sec-title">مشاريع نفتخر بها</h2>
+        <p class="sec-sub">نماذج حقيقية من تجارب عملائنا الناجحة عبر قطاعات متعددة.</p>
+      </div>
+      <div class="nav-arrows">
+        <button type="button" class="nav-arrow-btn" (click)="scrollGrid('projectsGrid', 'prev')" aria-label="السابق">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+        <button type="button" class="nav-arrow-btn" (click)="scrollGrid('projectsGrid', 'next')" aria-label="التالي">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="skeleton-grid" *ngIf="loadingProjects">
+      <div class="skeleton-card" *ngFor="let i of [1,2,3]"></div>
+    </div>
+
+    <div class="projects-grid" id="projectsGrid" *ngIf="!loadingProjects">
+      <div class="proj-card animate-on-scroll fade-up" *ngFor="let p of projects" (click)="openProject(p)" style="cursor:pointer">
+        <div class="proj-thumb">
+          <img [src]="getImageUrl(p.coverImage, 'project', p.name)" [alt]="p.name" class="proj-img" />
+          <div class="proj-img-overlay"></div>
+        </div>
+        <div class="proj-body">
+          <span class="proj-cat">{{ p.categoryName }}</span>
+          <h3 class="proj-name">{{ p.name }}</h3>
+          <p class="proj-desc">{{ p.description }}</p>
+          <span class="proj-date">📅 {{ formatDate(p.executionDate) }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CONTACT
+══════════════════════════════════════════════════════════════ -->
+<section class="contact-sec" id="contact">
+  <div class="sec-inner">
+    <div class="sec-eyebrow">تواصل معنا</div>
+    <h2 class="sec-title">ابدأ مشروعك اليوم</h2>
+    <p class="sec-sub">فريقنا جاهز للرد — أخبرنا بفكرتك وسنتولى الباقي.</p>
+
+    <div class="contact-grid">
+
+      <!-- Info column -->
+      <div class="contact-info-col">
+        <ng-container *ngIf="!loadingCompany && company?.contactInfo as ci">
+          <div class="contact-item">
+            <span class="contact-icon"><i class="bi bi-telephone-fill"></i></span>
+            <div>
+              <p class="contact-lbl">الهاتف</p>
+              <a [href]="'tel:' + ci.phone" class="contact-val">{{ ci.phone }}</a>
+            </div>
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon"><i class="bi bi-whatsapp"></i></span>
+            <div>
+              <p class="contact-lbl">واتساب</p>
+              <a [href]="'https://wa.me/' + ci.whatsApp" target="_blank" class="contact-val">{{ ci.whatsApp }}</a>
+            </div>
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon"><i class="bi bi-envelope-fill"></i></span>
+            <div>
+              <p class="contact-lbl">البريد الإلكتروني</p>
+              <a [href]="'mailto:' + ci.email" class="contact-val">{{ ci.email }}</a>
+            </div>
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon"><i class="bi bi-geo-alt-fill"></i></span>
+            <div>
+              <p class="contact-lbl">العنوان</p>
+              <a [href]="ci.googleMapUrl" target="_blank" class="contact-val">{{ ci.address }}</a>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- <div class="social-row" *ngIf="company?.socialMediaLinks?.length">
+          <a
+            *ngFor="let s of company!.socialMediaLinks"
+            [href]="s.url"
+            target="_blank"
+            class="social-btn"
+            [attr.data-platform]="s.platform"
+            [title]="s.platform"
+          >
+            <i [class]="getSocialIcon(s.platform)"></i>
+          </a>
+        </div> -->
+      </div>
+
+      <!-- Form -->
+      <form class="contact-form" (ngSubmit)="submitForm()" #f="ngForm">
+
+        <div class="success-msg" *ngIf="formSuccess">
+          ✅ تم إرسال طلبك بنجاح! سنتواصل معك قريباً.
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>الاسم الكامل *</label>
+            <input type="text" [(ngModel)]="contactForm.name" name="name"
+                   placeholder="محمد أحمد" required />
+          </div>
+          <div class="form-group">
+            <label>البريد الإلكتروني *</label>
+            <input type="email" [(ngModel)]="contactForm.email" name="email"
+                   placeholder="email@example.com" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>رقم الجوال</label>
+            <input type="tel" [(ngModel)]="contactForm.phone" name="phone"
+                   placeholder="+966 5XX XXX XXX" />
+          </div>
+          <div class="form-group">
+            <label>الخدمة المطلوبة</label>
+            <select [(ngModel)]="contactForm.serviceId" name="serviceId">
+              <option value="">اختر الخدمة...</option>
+              <option *ngFor="let s of services" [value]="s.id">{{ s.name }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>تفاصيل المشروع</label>
+          <textarea [(ngModel)]="contactForm.message" name="message"
+                    rows="4" placeholder="أخبرنا عن مشروعك وما تحتاجه..."></textarea>
+        </div>
+
+        <button type="submit" class="form-submit" [disabled]="formSubmitting">
+          <span *ngIf="!formSubmitting">إرسال الطلب ←</span>
+          <span *ngIf="formSubmitting">جاري الإرسال...</span>
+        </button>
+
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════════════════════════
+     PROJECT MODAL
+══════════════════════════════════════════════════════════════ -->
+<div class="proj-modal-backdrop" *ngIf="selectedProject" (click)="closeProject()">
+  <div class="proj-modal-card" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="proj-modal-header">
+      <h3>{{ selectedProject!.name }}</h3>
+      <button class="proj-modal-close" (click)="closeProject()" aria-label="إغلاق">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="proj-modal-body">
+
+      <!-- Main Image -->
+      <div class="proj-modal-main-img">
+        <img [src]="selectedProjectImage" [alt]="selectedProject!.name" />
+      </div>
+
+      <!-- Gallery thumbnails (cover + extra images if exist) -->
+      <div class="proj-modal-gallery" *ngIf="selectedProject!.images?.length">
+        <div
+          class="proj-gallery-thumb"
+          [class.active]="selectedProjectImage === getImageUrl(selectedProject!.coverImage, 'project', selectedProject!.name)"
+          (click)="selectProjectImage(getImageUrl(selectedProject!.coverImage, 'project', selectedProject!.name))"
+        >
+          <img [src]="getImageUrl(selectedProject!.coverImage, 'project', selectedProject!.name)" alt="غلاف" />
+        </div>
+        <div
+          class="proj-gallery-thumb"
+          *ngFor="let img of selectedProject!.images"
+          [class.active]="selectedProjectImage === getImageUrl(img.imageUrl, 'project', selectedProject!.name)"
+          (click)="selectProjectImage(getImageUrl(img.imageUrl, 'project', selectedProject!.name))"
+        >
+          <img [src]="getImageUrl(img.imageUrl, 'project', selectedProject!.name)" alt="صورة" />
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="proj-modal-info">
+        <div class="proj-modal-meta">
+          <span><i class="bi bi-tag-fill"></i> {{ selectedProject!.categoryName }}</span>
+          <span><i class="bi bi-calendar-fill"></i> {{ formatDate(selectedProject!.executionDate) }}</span>
+        </div>
+        <p class="proj-modal-desc">{{ selectedProject!.description }}</p>
+        <button class="btn-primary" style="margin-top:1.5rem" (click)="scrollTo('contact'); closeProject()">
+          ابدأ مشروعاً مشابهاً ←
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-top">
+    <div class="footer-col brand-col">
+      <div class="footer-logo">
+        <img [src]="getImageUrl(company?.logo || null, 'company')" alt="RunX Tech" class="footer-logo-img" />
+        <span>{{ company?.name || 'RUNX TECH' }}</span>
+      </div>
+      <p class="footer-about">
+        {{ company?.about || 'نبني مواقع وتطبيقات تقنية عالية الأداء تساعد شركتك على النمو الرقمي — بسرعة واحترافية لا مثيل لها.' }}
+      </p>
+      
+      <div class="social-row" *ngIf="company?.socialMediaLinks?.length">
+        <a *ngFor="let s of company!.socialMediaLinks" [href]="s.url" target="_blank" class="social-btn footer-social" [attr.data-platform]="s.platform" [title]="s.platform">
+          <i [class]="getSocialIcon(s.platform)"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-col links-col">
+      <h4 class="footer-heading">روابط سريعة</h4>
+      <nav class="footer-nav-list">
+        <a (click)="scrollTo('home')">الرئيسية</a>
+        <a (click)="scrollTo('services')">خدماتنا</a>
+        <a (click)="scrollTo('packages')">الباقات والأسعار</a>
+        <a (click)="scrollTo('projects')">أعمالنا</a>
+        <a (click)="scrollTo('about')">من نحن</a>
+      </nav>
+    </div>
+<!-- 
+    <div class="footer-col contact-col">
+      <h4 class="footer-heading">معلومات التواصل</h4>
+      <ul class="footer-contact-list" *ngIf="company?.contactInfo as ci">
+        <li><i class="bi bi-geo-alt-fill"></i> <a [href]="ci.googleMapUrl" target="_blank">{{ ci.address }}</a></li>
+        <li><i class="bi bi-telephone-fill"></i> <a [href]="'tel:' + ci.phone" dir="ltr">{{ ci.phone }}</a></li>
+        <li><i class="bi bi-envelope-fill"></i> <a [href]="'mailto:' + ci.email">{{ ci.email }}</a></li>
+      </ul>
+    </div> -->
+  </div>
+
+  <div class="footer-bottom">
+    <p class="footer-copy">© {{ currentYear }} {{ company?.name || 'RunX Tech' }} — جميع الحقوق محفوظة.</p>
+    
+    <button class="scroll-top-btn" (click)="scrollTo('home')" aria-label="العودة للأعلى">
+      <i class="bi bi-arrow-up"></i>
+    </button>
+  </div>
+</footer>

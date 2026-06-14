@@ -1,0 +1,64 @@
+<div class="login-wrapper">
+  <div class="glow-sphere sphere-1"></div>
+  <div class="glow-sphere sphere-2"></div>
+
+  <div class="login-card">
+    <div class="card-header">
+      <div class="logo-badge">
+        <i class="bi bi-shield-lock-fill"></i>
+      </div>
+      <h2>لوحة التحكم</h2>
+      <p>تسجيل الدخول للمسؤولين فقط</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="form-group">
+        <label for="email">البريد الإلكتروني</label>
+        <div class="input-container">
+          <i class="bi bi-envelope"></i>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            [(ngModel)]="email" 
+            required 
+            placeholder="admin@example.com"
+            dir="ltr"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">كلمة المرور</label>
+        <div class="input-container">
+          <i class="bi bi-lock"></i>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            [(ngModel)]="password" 
+            required 
+            placeholder="••••••••"
+            dir="ltr"
+          />
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-banner animate-fade-in">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <button type="submit" [disabled]="isLoading" class="btn-submit">
+        <span *ngIf="!isLoading">دخول</span>
+        <span *ngIf="isLoading" class="loader"></span>
+      </button>
+    </form>
+    
+    <div class="card-footer">
+      <a href="/" class="back-link">
+        <i class="bi bi-arrow-right"></i> العودة للموقع الرئيسي
+      </a>
+    </div>
+  </div>
+</div>

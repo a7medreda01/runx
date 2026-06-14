@@ -1,0 +1,119 @@
+<div class="manage-container animate-fade-in">
+  <div class="header-section flex-header">
+    <div>
+      <h3>خدمات الشركة</h3>
+      <p>إدارة الخدمات المعروضة على الموقع وربطها بالتصنيفات</p>
+    </div>
+    <button (click)="openAddForm()" class="btn-primary-sm">
+      <i class="bi bi-plus-lg"></i> إضافة خدمة جديدة
+    </button>
+  </div>
+
+  <!-- Banners -->
+  <div *ngIf="successMessage" class="alert-success animate-fade-in">
+    <i class="bi bi-check-circle-fill"></i> {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="alert-error animate-fade-in">
+    <i class="bi bi-exclamation-triangle-fill"></i> {{ errorMessage }}
+  </div>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <span>جاري تحميل الخدمات...</span>
+  </div>
+
+  <!-- Table List -->
+  <div *ngIf="!isLoading" class="table-card">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width: 80px;">الصورة</th>
+          <th>اسم الخدمة</th>
+          <th>التصنيف</th>
+          <th>الوصف</th>
+          <th style="width: 150px; text-align: center;">العمليات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let svc of services">
+          <td>
+            <div class="table-img-wrapper">
+              <img [src]="svc.imageUrl || 'assets/placeholder-service.png'" alt="Service Image" class="table-thumb" />
+            </div>
+          </td>
+          <td class="font-bold text-white">{{ svc.name }}</td>
+          <td><span class="badge">{{ svc.categoryName || 'بدون تصنيف' }}</span></td>
+          <td class="text-desc text-truncate">{{ svc.description || 'لا يوجد وصف' }}</td>
+          <td>
+            <div class="action-buttons">
+              <button (click)="openEditForm(svc)" class="btn-action edit" title="تعديل">
+                <i class="bi bi-pencil-square"></i>
+              </button>
+              <button (click)="deleteService(svc.id)" class="btn-action delete" title="حذف">
+                <i class="bi bi-trash-fill"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="services.length === 0">
+          <td colspan="5" class="empty-row">لا توجد خدمات حالياً. قم بإضافة خدمة جديدة.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal Form Backdrop -->
+  <div *ngIf="isFormOpen" class="modal-backdrop animate-fade-in">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4>{{ formTitle }}</h4>
+        <button (click)="closeForm()" class="btn-close"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <form (ngSubmit)="onSubmit()">
+        <div class="modal-body scrollable-body">
+          <div class="form-group">
+            <label for="svcName">اسم الخدمة *</label>
+            <input type="text" id="svcName" [(ngModel)]="name" name="name" required placeholder="مثال: إدارة حملات إعلانية" />
+          </div>
+
+          <div class="form-group">
+            <label for="svcCategory">التصنيف *</label>
+            <select id="svcCategory" [(ngModel)]="categoryId" name="categoryId" required>
+              <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+              <option *ngIf="categories.length === 0" disabled>الرجاء إنشاء تصنيف أولاً</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="svcDesc">الوصف *</label>
+            <textarea id="svcDesc" [(ngModel)]="description" name="description" rows="4" required placeholder="اكتب تفاصيل ووصف الخدمة..."></textarea>
+          </div>
+
+          <!-- Image Picker -->
+          <div class="form-group">
+            <label>صورة الخدمة</label>
+            <div class="image-uploader">
+              <div *ngIf="imagePreview" class="preview-box">
+                <img [src]="imagePreview" alt="Preview" class="preview-img" />
+              </div>
+              <label class="btn-file-select">
+                <i class="bi bi-upload"></i> اختر صورة
+                <input type="file" (change)="onImageSelected($event)" accept="image/*" style="display: none;" />
+              </label>
+              <span *ngIf="selectedImage" class="file-chosen-text">{{ selectedImage.name }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" (click)="closeForm()" class="btn-secondary">إلغاء</button>
+          <button type="submit" [disabled]="isSaving || categories.length === 0" class="btn-primary">
+            <span *ngIf="!isSaving">حفظ</span>
+            <span *ngIf="isSaving" class="btn-spinner"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

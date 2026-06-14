@@ -1,0 +1,85 @@
+<div class="manage-container animate-fade-in">
+  <div class="header-section">
+    <h3>بيانات وتفاصيل الشركة</h3>
+    <p>تعديل الشعار والغلاف ورؤية وأهداف وقيم الشركة</p>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <span>جاري تحميل بيانات الشركة...</span>
+  </div>
+
+  <div *ngIf="!isLoading && company">
+    <!-- Success/Error Banners -->
+    <div *ngIf="successMessage" class="alert-success animate-fade-in">
+      <i class="bi bi-check-circle-fill"></i> {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="alert-error animate-fade-in">
+      <i class="bi bi-exclamation-triangle-fill"></i> {{ errorMessage }}
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="company-form">
+      <div class="media-grids">
+        <!-- Logo Upload Card -->
+        <div class="upload-card">
+          <label class="card-title">شعار الشركة (Logo)</label>
+          <div class="logo-preview-wrapper">
+            <img [src]="logoPreview || 'assets/placeholder-logo.png'" alt="Company Logo" class="logo-img-preview" />
+          </div>
+          <label class="btn-file-select">
+            <i class="bi bi-upload"></i> اختر شعاراً جديداً
+            <input type="file" (change)="onLogoSelected($event)" accept="image/*" style="display: none;" />
+          </label>
+          <span *ngIf="selectedLogo" class="file-chosen-text">{{ selectedLogo.name }}</span>
+        </div>
+
+        <!-- Cover Image Upload Card -->
+        <div class="upload-card cover-card">
+          <label class="card-title">صورة الغلاف (Cover Image)</label>
+          <div class="cover-preview-wrapper">
+            <img [src]="coverPreview || 'assets/placeholder-cover.jpg'" alt="Cover Image" class="cover-img-preview" />
+          </div>
+          <label class="btn-file-select">
+            <i class="bi bi-upload"></i> اختر غلافاً جديداً
+            <input type="file" (change)="onCoverSelected($event)" accept="image/*" style="display: none;" />
+          </label>
+          <span *ngIf="selectedCover" class="file-chosen-text">{{ selectedCover.name }}</span>
+        </div>
+      </div>
+
+      <div class="text-inputs-grid">
+        <div class="form-group full-width">
+          <label for="companyName">اسم الشركة</label>
+          <input type="text" id="companyName" [(ngModel)]="name" name="name" required placeholder="مثال: شركة رن إكس للتسويق" />
+        </div>
+
+        <div class="form-group">
+          <label for="experience">سنوات الخبرة</label>
+          <input type="number" id="experience" [(ngModel)]="yearsOfExperience" name="yearsOfExperience" min="0" required />
+        </div>
+
+        <div class="form-group full-width">
+          <label for="about">نبذة عن الشركة</label>
+          <textarea id="about" [(ngModel)]="about" name="about" rows="4" required placeholder="تحدث عن تأسيس الشركة وخدماتها..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="vision">رؤية الشركة</label>
+          <textarea id="vision" [(ngModel)]="vision" name="vision" rows="4" placeholder="مثال: أن نكون الشركة الرائدة في تقديم الحلول البرمجية..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="mission">رسالة الشركة</label>
+          <textarea id="mission" [(ngModel)]="mission" name="mission" rows="4" placeholder="مثال: تقديم أفضل قيمة وابتكار تقني لعملائنا..."></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" [disabled]="isSaving" class="btn-primary">
+          <span *ngIf="!isSaving"><i class="bi bi-save"></i> حفظ التغييرات</span>
+          <span *ngIf="isSaving" class="btn-spinner"></span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

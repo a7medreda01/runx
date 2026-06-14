@@ -1,0 +1,176 @@
+<div class="manage-container animate-fade-in">
+  <div class="header-section flex-header">
+    <div>
+      <h3>معرض أعمال ومشاريع الشركة</h3>
+      <p>إدارة المشاريع المنفذة من قبل الشركة والصور الملحقة بها</p>
+    </div>
+    <button (click)="openAddForm()" class="btn-primary-sm">
+      <i class="bi bi-plus-lg"></i> إضافة مشروع جديد
+    </button>
+  </div>
+
+  <!-- Banners -->
+  <div *ngIf="successMessage" class="alert-success animate-fade-in">
+    <i class="bi bi-check-circle-fill"></i> {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="alert-error animate-fade-in">
+    <i class="bi bi-exclamation-triangle-fill"></i> {{ errorMessage }}
+  </div>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <span>جاري تحميل المشاريع...</span>
+  </div>
+
+  <!-- Table List -->
+  <div *ngIf="!isLoading" class="table-card">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width: 80px;">الغلاف</th>
+          <th>اسم المشروع</th>
+          <th>التصنيف</th>
+          <th>تاريخ التنفيذ</th>
+          <th style="text-align: center;">معرض الصور</th>
+          <th style="width: 150px; text-align: center;">العمليات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let proj of projects">
+          <td>
+            <div class="table-img-wrapper">
+              <img [src]="proj.coverImage || 'assets/placeholder-project.jpg'" alt="Cover" class="table-thumb" />
+            </div>
+          </td>
+          <td class="font-bold text-white">{{ proj.name }}</td>
+          <td><span class="badge">{{ proj.categoryName || 'بدون تصنيف' }}</span></td>
+          <td class="text-desc">{{ proj.executionDate | date:'yyyy/MM/dd' }}</td>
+          <td style="text-align: center;">
+            <span class="gallery-counter">
+              <i class="bi bi-images"></i> {{ proj.images?.length || 0 }} صور
+            </span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button (click)="openEditForm(proj)" class="btn-action edit" title="تعديل">
+                <i class="bi bi-pencil-square"></i>
+              </button>
+              <button (click)="deleteProject(proj.id)" class="btn-action delete" title="حذف">
+                <i class="bi bi-trash-fill"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="projects.length === 0">
+          <td colspan="6" class="empty-row">لا توجد مشاريع حالياً. قم بإضافة مشروع جديد.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal Form Backdrop -->
+  <div *ngIf="isFormOpen" class="modal-backdrop animate-fade-in">
+    <div class="modal-card wide-modal">
+      <div class="modal-header">
+        <h4>{{ formTitle }}</h4>
+        <button (click)="closeForm()" class="btn-close"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <form (ngSubmit)="onSubmit()">
+        <div class="modal-body scrollable-body">
+          <div class="two-col-grid">
+            <div class="form-group">
+              <label for="projName">اسم المشروع *</label>
+              <input type="text" id="projName" [(ngModel)]="name" name="name" required placeholder="مثال: متجر إلكتروني متكامل" />
+            </div>
+
+            <div class="form-group">
+              <label for="projCategory">التصنيف *</label>
+              <select id="projCategory" [(ngModel)]="categoryId" name="categoryId" required>
+                <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+                <option *ngIf="categories.length === 0" disabled>الرجاء إنشاء تصنيف أولاً</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="two-col-grid">
+            <div class="form-group">
+              <label for="projDate">تاريخ التنفيذ *</label>
+              <input type="date" id="projDate" [(ngModel)]="executionDate" name="executionDate" required />
+            </div>
+
+            <div class="form-group">
+              <label>صورة الغلاف الأساسية</label>
+              <div class="image-uploader">
+                <div *ngIf="coverPreview" class="preview-box">
+                  <img [src]="coverPreview" alt="Cover Preview" class="preview-img" />
+                </div>
+                <label class="btn-file-select">
+                  <i class="bi bi-upload"></i> اختر غلافاً
+                  <input type="file" (change)="onCoverSelected($event)" accept="image/*" style="display: none;" />
+                </label>
+                <span *ngIf="selectedCover" class="file-chosen-text">{{ selectedCover.name }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="projDesc">تفاصيل ووصف المشروع *</label>
+            <textarea id="projDesc" [(ngModel)]="description" name="description" rows="4" required placeholder="تحدث عن تفاصيل المشروع والتقنيات المستخدمة والنتائج..."></textarea>
+          </div>
+
+          <!-- Gallery Images Section -->
+          <div class="gallery-management-section">
+            <h5><i class="bi bi-images"></i> معرض الصور الإضافية</h5>
+
+            <!-- Existing Images Grid with delete -->
+            <div *ngIf="editingId && projectGallery.length > 0" class="existing-gallery">
+              <div *ngFor="let img of projectGallery" class="gallery-item-preview">
+                <img [src]="img.imageUrl" alt="Gallery Image" />
+                <button type="button" class="gallery-delete-btn" (click)="deleteGalleryImage(img.id)" title="حذف الصورة">
+                  <i class="bi bi-trash-fill"></i>
+                </button>
+              </div>
+            </div>
+            <p *ngIf="editingId && projectGallery.length === 0" class="gallery-empty-text">
+              <i class="bi bi-image"></i> لا توجد صور إضافية حالياً.
+            </p>
+
+            <!-- Upload new gallery images -->
+            <div class="gallery-upload-box">
+              <label>إضافة صور جديدة للمعرض</label>
+              <div class="uploader-row">
+                <label class="btn-file-select">
+                  <i class="bi bi-cloud-upload"></i> اختر صوراً
+                  <input type="file" (change)="onGallerySelected($event)" accept="image/*" multiple style="display: none;" />
+                </label>
+                <span *ngIf="selectedGalleryFiles.length > 0" class="file-chosen-text">
+                  تم تحديد {{ selectedGalleryFiles.length }} ملفات
+                </span>
+                <button
+                  *ngIf="editingId && selectedGalleryFiles.length > 0"
+                  type="button"
+                  (click)="uploadGalleryImages(editingId || 0)"
+                  [disabled]="isUploadingGallery"
+                  class="btn-secondary-sm"
+                >
+                  <span *ngIf="!isUploadingGallery"><i class="bi bi-cloud-arrow-up"></i> رفع الآن</span>
+                  <span *ngIf="isUploadingGallery" class="btn-spinner"></span>
+                </button>
+              </div>
+              <small class="upload-hint">يمكنك تحديد عدة صور بالضغط على Ctrl أو Shift.، سيتم رفعها فور الضغط على "رفع الآن".، وعند الحفظ سيتم رفعها تلقائياً.</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" (click)="closeForm()" class="btn-secondary">إلغاء</button>
+          <button type="submit" [disabled]="isSaving || categories.length === 0" class="btn-primary">
+            <span *ngIf="!isSaving">حفظ المشروع</span>
+            <span *ngIf="isSaving" class="btn-spinner"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

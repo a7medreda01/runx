@@ -1,0 +1,155 @@
+<div class="manage-container animate-fade-in">
+  <div class="header-section">
+    <h3>بيانات الاتصال والتواصل الاجتماعي</h3>
+    <p>تحديث وسائل الاتصال الرسمية للشركة وإدارة حسابات التواصل الاجتماعي</p>
+  </div>
+
+  <div class="two-column-layout">
+    <!-- Contact Info Form -->
+    <div class="card-panel">
+      <div class="panel-header">
+        <h4>بيانات الاتصال</h4>
+        <p>الأرقام والعناوين المعروضة على الموقع</p>
+      </div>
+
+      <div *ngIf="isLoadingContact" class="loading-state-sm">
+        <div class="spinner-sm"></div>
+        <span>جاري التحميل...</span>
+      </div>
+
+      <div *ngIf="!isLoadingContact">
+        <div *ngIf="contactSuccess" class="alert-success animate-fade-in">
+          <i class="bi bi-check-circle-fill"></i> {{ contactSuccess }}
+        </div>
+        <div *ngIf="contactError" class="alert-error animate-fade-in">
+          <i class="bi bi-exclamation-triangle-fill"></i> {{ contactError }}
+        </div>
+
+        <form (ngSubmit)="onSubmitContact()">
+          <div class="form-group">
+            <label for="phone">رقم الهاتف</label>
+            <input type="text" id="phone" [(ngModel)]="phone" name="phone" placeholder="مثال: +966500000000" dir="ltr" />
+          </div>
+
+          <div class="form-group">
+            <label for="whatsApp">رقم الواتساب</label>
+            <input type="text" id="whatsApp" [(ngModel)]="whatsApp" name="whatsApp" placeholder="مثال: +966500000000" dir="ltr" />
+          </div>
+
+          <div class="form-group">
+            <label for="email">البريد الإلكتروني</label>
+            <input type="email" id="email" [(ngModel)]="email" name="email" placeholder="email@company.com" dir="ltr" />
+          </div>
+
+          <div class="form-group">
+            <label for="address">العنوان</label>
+            <input type="text" id="address" [(ngModel)]="address" name="address" placeholder="مثال: الرياض، المملكة العربية السعودية" />
+          </div>
+
+          <div class="form-group">
+            <label for="mapUrl">رابط موقع خرائط جوجل (Google Maps Iframe Embed URL)</label>
+            <textarea id="mapUrl" [(ngModel)]="googleMapUrl" name="googleMapUrl" rows="3" placeholder="https://www.google.com/maps/embed?..." dir="ltr"></textarea>
+          </div>
+
+          <div class="form-actions-inline">
+            <button type="submit" [disabled]="isSavingContact" class="btn-primary-sm">
+              <span *ngIf="!isSavingContact"><i class="bi bi-save"></i> حفظ البيانات</span>
+              <span *ngIf="isSavingContact" class="btn-spinner"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Social Media Manager -->
+    <div class="card-panel">
+      <div class="panel-header flex-header-row">
+        <div>
+          <h4>حسابات التواصل الاجتماعي</h4>
+          <p>منصات فيسبوك، تويتر، انستجرام، إلخ.</p>
+        </div>
+        <button (click)="openAddSocial()" class="btn-secondary-sm">
+          <i class="bi bi-plus-lg"></i> إضافة حساب
+        </button>
+      </div>
+
+      <div *ngIf="socialSuccess" class="alert-success animate-fade-in">
+        <i class="bi bi-check-circle-fill"></i> {{ socialSuccess }}
+      </div>
+      <div *ngIf="socialError" class="alert-error animate-fade-in">
+        <i class="bi bi-exclamation-triangle-fill"></i> {{ socialError }}
+      </div>
+
+      <div *ngIf="isLoadingSocial" class="loading-state-sm">
+        <div class="spinner-sm"></div>
+        <span>جاري التحميل...</span>
+      </div>
+
+      <!-- Links Table -->
+      <div *ngIf="!isLoadingSocial" class="table-card-inline">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>المنصة</th>
+              <th>الرابط</th>
+              <th style="width: 100px; text-align: center;">العمليات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let link of socialLinks">
+              <td class="font-bold text-white">
+                <i class="bi bi-link-45deg"></i> {{ link.platform }}
+              </td>
+              <td class="text-desc text-truncate" dir="ltr" style="text-align: right;">{{ link.url }}</td>
+              <td>
+                <div class="action-buttons">
+                  <button (click)="openEditSocial(link)" class="btn-action edit" title="تعديل">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button (click)="deleteSocial(link.id)" class="btn-action delete" title="حذف">
+                    <i class="bi bi-trash-fill"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="socialLinks.length === 0">
+              <td colspan="3" class="empty-row-sm">لا توجد حسابات مضافة حالياً.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Social Account Form Modal -->
+  <div *ngIf="isSocialFormOpen" class="modal-backdrop animate-fade-in">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4>{{ socialFormTitle }}</h4>
+        <button (click)="closeSocialForm()" class="btn-close"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <form (ngSubmit)="onSubmitSocial()">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="platform">اسم المنصة *</label>
+            <input type="text" id="platform" [(ngModel)]="socialPlatform" name="platform" required placeholder="مثال: Instagram أو LinkedIn" />
+          </div>
+
+          <div class="form-group">
+            <label for="url">رابط الحساب (URL) *</label>
+            <input type="url" id="url" [(ngModel)]="socialUrl" name="url" required placeholder="https://instagram.com/username" dir="ltr" />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" (click)="closeSocialForm()" class="btn-secondary">إلغاء</button>
+          <button type="submit" [disabled]="isSavingSocial" class="btn-primary">
+            <span *ngIf="!isSavingSocial">حفظ</span>
+            <span *ngIf="isSavingSocial" class="btn-spinner"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

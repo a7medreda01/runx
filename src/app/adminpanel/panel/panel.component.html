@@ -1,0 +1,224 @@
+<div class="panel-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.mobile-open]="mobileSidebarOpen">
+    <div class="sidebar-header">
+      <div class="logo-circle">
+        <i class="bi bi-speedometer2"></i>
+      </div>
+      <div>
+        <h3>مدير النظام</h3>
+        <span class="user-email">def@admin.com</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-menu">
+      <button (click)="switchTab('overview')" [class.active]="activeTab === 'overview'">
+        <i class="bi bi-grid-1x2-fill"></i> نظرة عامة
+      </button>
+
+      <button (click)="switchTab('company')" [class.active]="activeTab === 'company'">
+        <i class="bi bi-building-fill"></i> بيانات الشركة
+      </button>
+
+      <button (click)="switchTab('categories')" [class.active]="activeTab === 'categories'">
+        <i class="bi bi-tags-fill"></i> تصنيفات الخدمات
+      </button>
+
+      <button (click)="switchTab('services')" [class.active]="activeTab === 'services'">
+        <i class="bi bi-briefcase-fill"></i> خدمات الشركة
+      </button>
+
+      <button (click)="switchTab('projects')" [class.active]="activeTab === 'projects'">
+        <i class="bi bi-images"></i> معرض المشاريع
+      </button>
+
+      <button (click)="switchTab('packages')" [class.active]="activeTab === 'packages'">
+        <i class="bi bi-currency-dollar"></i> باقات الأسعار
+      </button>
+
+      <button (click)="switchTab('contact-social')" [class.active]="activeTab === 'contact-social'">
+        <i class="bi bi-telephone-outbound-fill"></i> الاتصال والتواصل
+      </button>
+
+      <button (click)="switchTab('settings')" [class.active]="activeTab === 'settings'">
+        <i class="bi bi-gear-wide-connected"></i> إعدادات الموقع
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button (click)="onLogout()" class="btn-logout-sidebar">
+        <i class="bi bi-box-arrow-right"></i> تسجيل الخروج
+      </button>
+    </div>
+  </aside>
+
+  <!-- Sidebar mobile backdrop -->
+  <div *ngIf="mobileSidebarOpen" class="sidebar-backdrop" (click)="toggleMobileSidebar()"></div>
+
+  <!-- Main Container -->
+  <main class="main-content">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-right">
+        <button class="btn-toggle-menu" (click)="toggleMobileSidebar()">
+          <i class="bi bi-list"></i>
+        </button>
+        <h2 class="active-title">
+          <span *ngIf="activeTab === 'overview'">لوحة التحكم الرئيسية</span>
+          <span *ngIf="activeTab === 'company'">بيانات وتفاصيل الشركة</span>
+          <span *ngIf="activeTab === 'categories'">إدارة تصنيفات الخدمات</span>
+          <span *ngIf="activeTab === 'services'">إدارة الخدمات</span>
+          <span *ngIf="activeTab === 'projects'">إدارة معرض المشاريع</span>
+          <span *ngIf="activeTab === 'packages'">إدارة الباقات والأسعار</span>
+          <span *ngIf="activeTab === 'contact-social'">بيانات الاتصال والتواصل الاجتماعي</span>
+          <span *ngIf="activeTab === 'settings'">إعدادات الموقع العامة</span>
+        </h2>
+      </div>
+
+      <div class="topbar-left">
+        <a href="/" target="_blank" class="btn-view-site">
+          <i class="bi bi-globe"></i> <span>عرض الموقع</span>
+        </a>
+        <button (click)="onLogout()" class="btn-logout-topbar" title="تسجيل الخروج">
+          <i class="bi bi-power"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <div class="content-wrapper">
+      
+      <!-- Tab 1: Overview Dashboard -->
+      <div *ngIf="activeTab === 'overview'" class="overview-dashboard animate-fade-in">
+        <div class="welcome-banner">
+          <h1>مرحباً بك مجدداً في لوحة التحكم!</h1>
+          <p>أنت تقوم بإدارة محتوى موقع: <strong>{{ stats.companyName }}</strong></p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card cursor-pointer" (click)="switchTab('services')">
+            <div class="stat-icon icon-services">
+              <i class="bi bi-briefcase"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.servicesCount }}</h3>
+              <p>الخدمات الحالية</p>
+            </div>
+          </div>
+
+          <div class="stat-card cursor-pointer" (click)="switchTab('projects')">
+            <div class="stat-icon icon-projects">
+              <i class="bi bi-images"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.projectsCount }}</h3>
+              <p>المشاريع المنفذة</p>
+            </div>
+          </div>
+
+          <div class="stat-card cursor-pointer" (click)="switchTab('packages')">
+            <div class="stat-icon icon-packages">
+              <i class="bi bi-currency-dollar"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.packagesCount }}</h3>
+              <p>باقات الأسعار</p>
+            </div>
+          </div>
+
+          <div class="stat-card cursor-pointer" (click)="switchTab('categories')">
+            <div class="stat-icon icon-categories">
+              <i class="bi bi-tags"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.categoriesCount }}</h3>
+              <p>أقسام وتصنيفات</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shortcuts & Info Grid -->
+        <div class="dashboard-grids">
+          <!-- Quick Actions -->
+          <div class="info-card">
+            <h4>روابط وإجراءات سريعة</h4>
+            <div class="shortcuts-list">
+              <button (click)="switchTab('company')" class="shortcut-item">
+                <i class="bi bi-building"></i> تعديل الشعار ومعلومات الشركة
+              </button>
+              <button (click)="switchTab('services')" class="shortcut-item">
+                <i class="bi bi-plus-circle"></i> إضافة خدمة جديدة
+              </button>
+              <button (click)="switchTab('projects')" class="shortcut-item">
+                <i class="bi bi-image-fill"></i> إضافة مشروع لمعرض الأعمال
+              </button>
+              <button (click)="switchTab('contact-social')" class="shortcut-item">
+                <i class="bi bi-telephone"></i> تحديث رقم الهاتف والواتساب
+              </button>
+            </div>
+          </div>
+
+          <!-- System Info -->
+          <div class="info-card">
+            <h4>تفاصيل الجلسة الحالية</h4>
+            <table class="info-table">
+              <tr>
+                <td>نوع الحساب:</td>
+                <td><span class="badge-role">مدير النظام (Admin)</span></td>
+              </tr>
+              <tr>
+                <td>البريد الإلكتروني:</td>
+                <td><code class="code-email">def&#64;admin.com</code></td>
+              </tr>
+              <tr>
+                <td>مسار لوحة التحكم:</td>
+                <td><code>/admin</code></td>
+              </tr>
+              <tr>
+                <td>حالة الاتصال بالخادم:</td>
+                <td><span class="status-indicator online"></span> متصل</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Company Management -->
+      <div *ngIf="activeTab === 'company'">
+        <app-company-manage></app-company-manage>
+      </div>
+
+      <!-- Tab 3: Service Categories Management -->
+      <div *ngIf="activeTab === 'categories'">
+        <app-category-manage></app-category-manage>
+      </div>
+
+      <!-- Tab 4: Services Management -->
+      <div *ngIf="activeTab === 'services'">
+        <app-service-manage></app-service-manage>
+      </div>
+
+      <!-- Tab 5: Projects Management -->
+      <div *ngIf="activeTab === 'projects'">
+        <app-project-manage></app-project-manage>
+      </div>
+
+      <!-- Tab 6: Packages Management -->
+      <div *ngIf="activeTab === 'packages'">
+        <app-package-manage></app-package-manage>
+      </div>
+
+      <!-- Tab 7: Contact and Social Links -->
+      <div *ngIf="activeTab === 'contact-social'">
+        <app-contact-social-manage></app-contact-social-manage>
+      </div>
+
+      <!-- Tab 8: Site Settings Management -->
+      <div *ngIf="activeTab === 'settings'">
+        <app-site-setting-manage></app-site-setting-manage>
+      </div>
+
+    </div>
+  </main>
+</div>
