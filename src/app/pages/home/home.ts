@@ -19,7 +19,7 @@ import { Project } from '../../core/models/project.model';
        moves to the side column on desktop -->
   <div class="lg:hidden -mt-32 -mx-4 sm:-mx-6 mb-8">
     <img 
-      src="assets/images/banner.png" 
+      src="/banner.png" 
       alt="runx tech banner" 
       class="w-full h-auto object-cover"
       referrerpolicy="no-referrer"
@@ -33,12 +33,7 @@ import { Project } from '../../core/models/project.model';
       <!-- Hero Content -->
       <div class="lg:col-span-7 space-y-6 text-right">
         
-        <!-- Badge -->
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF5F8] border border-[#E8336D]/30 text-[#E8336D] text-xs sm:text-sm font-bold shadow-xs max-w-full overflow-hidden">
-          <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#E8336D] animate-ping shrink-0"></span>
-          <span class="truncate">نحدث الفارق التقني لأعمالك</span>
-          <span class="font-mono text-slate-400 text-[11px] sm:text-xs shrink-0 border-r border-slate-200 pr-2 mr-0.5">Runx Tech</span>
-        </div>
+
 
         <!-- Main Title -->
         <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold font-display leading-[1.25] sm:leading-[1.2] text-[#0F172A] tracking-tight">
