@@ -21,7 +21,7 @@ import { Project } from '../../core/models/project.model';
     <img 
       src="/banner.png" 
       alt="runx tech banner" 
-      class="w-full h-auto object-cover rounded-2xl shadow-sm"
+      class="w-full h-auto object-cover "
       referrerpolicy="no-referrer"
     >
   </div>
