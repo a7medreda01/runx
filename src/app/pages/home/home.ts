@@ -15,13 +15,13 @@ import { Project } from '../../core/models/project.model';
 <!-- HERO SECTION -->
 <section class="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-transparent overflow-hidden">
 
-  <!-- Banner Image - shows FIRST on mobile (full width, no border/text), 
+  <!-- Banner Image - shows FIRST on mobile, below the navbar with matching side margins,
        moves to the side column on desktop -->
-  <div class="lg:hidden -mt-32 -mx-4 sm:-mx-6 mb-8">
+  <div class="lg:hidden mb-8">
     <img 
       src="/banner.png" 
       alt="runx tech banner" 
-      class="w-full h-auto object-cover"
+      class="w-full h-auto object-cover rounded-2xl shadow-sm"
       referrerpolicy="no-referrer"
     >
   </div>
