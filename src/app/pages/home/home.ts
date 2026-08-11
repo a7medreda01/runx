@@ -12,94 +12,97 @@ import { Project } from '../../core/models/project.model';
   template: `
     <div class="relative text-slate-800">
       
-      <!-- HERO SECTION -->
-      <section class="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-transparent overflow-hidden">
-        <div class="max-w-7xl mx-auto">
-          
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
-            <!-- Hero Content -->
-            <div class="lg:col-span-7 space-y-6 text-right">
-              
-              <!-- Badge -->
-              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF5F8] border border-[#E8336D]/30 text-[#E8336D] text-xs sm:text-sm font-bold shadow-xs max-w-full overflow-hidden">
-                <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#E8336D] animate-ping shrink-0"></span>
-                <span class="truncate">نحدث الفارق التقني لأعمالك</span>
-                <span class="font-mono text-slate-400 text-[11px] sm:text-xs shrink-0 border-r border-slate-200 pr-2 mr-0.5">Runx Tech</span>
-              </div>
+<!-- HERO SECTION -->
+<section class="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-transparent overflow-hidden">
 
-              <!-- Main Title -->
-              <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold font-display leading-[1.25] sm:leading-[1.2] text-[#0F172A] tracking-tight">
-                نبتكر ونبني <span class="bg-gradient-to-r from-[#FF5E3A] via-[#E8336D] to-[#7B1FA2] bg-clip-text text-transparent">حلولاً رقمية</span> فائقة الجودة والأداء
-              </h1>
+  <!-- Banner Image - shows FIRST on mobile (full width, no border/text), 
+       moves to the side column on desktop -->
+  <div class="lg:hidden -mt-32 -mx-4 sm:-mx-6 mb-8">
+    <img 
+      src="assets/images/banner.png" 
+      alt="runx tech banner" 
+      class="w-full h-auto object-cover"
+      referrerpolicy="no-referrer"
+    >
+  </div>
 
-              <!-- Subtitle -->
-              <p class="subtext-lead max-w-2xl text-slate-700">
-                شركة <strong class="text-[#0F172A] font-extrabold">RunX</strong> متخصصة في تصميم وتطوير المواقع المخصصة، المتاجر الإلكترونية، وتطبيقات الجوال والأنظمة السحابية برؤية هندسية احترافية تتجاوز التوقعات.
-              </p>
-
-              <!-- CTAs -->
-              <div class="flex flex-col sm:flex-row items-center gap-4 pt-2">
-                <a 
-                  routerLink="/calculator" 
-                  class="btn-runx-primary text-base px-8 py-3.5 w-full sm:w-auto text-center font-bold"
-                >
-                  <span>احسب كلفة مشروعك الآن</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M5 12h14"></path>
-                    <path d="m12 5 7 7-7 7"></path>
-                  </svg>
-                </a>
-
-                <a 
-                  routerLink="/projects" 
-                  class="btn-runx-outline text-base px-8 py-3.5 w-full sm:w-auto text-center font-semibold"
-                >
-                  <span>استكشف معرض أعمالنا</span>
-                </a>
-              </div>
-
-              <!-- Key Trust Features -->
-              <div class="pt-6 grid grid-cols-3 gap-4 border-t border-slate-200/80 text-right">
-                <div>
-                  <span class="block text-2xl font-bold font-mono text-[#0F172A]">100+</span>
-                  <span class="subtext-muted text-slate-600 font-semibold">مشروع برمجيات مُسّلم</span>
-                </div>
-                <div>
-                  <span class="block text-2xl font-bold font-mono text-[#C1662F]">99.8%</span>
-                  <span class="subtext-muted text-slate-600 font-semibold">نسبة جودة الرضا</span>
-                </div>
-                <div>
-                  <span class="block text-2xl font-bold font-mono text-[#0F172A]">0.8s</span>
-                  <span class="subtext-muted text-slate-600 font-semibold">سرعة أداء خرافية</span>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- Hero Image Showcase Frame -->
-            <div class="lg:col-span-5 relative">
-              <div class="relative rounded-2xl overflow-hidden bg-slate-900 border border-slate-200/90 shadow-2xl p-2 group">
-                <img 
-                  src="assets/images/hero_tech_isometric_1786478616373.jpg" 
-                  alt="runx tech architecture" 
-                  class="w-full h-auto rounded-xl object-cover transition-transform duration-700 group-hover:scale-102"
-                  referrerpolicy="no-referrer"
-                >
-                <div class="absolute bottom-4 right-4 left-4 p-3 sm:p-4 rounded-xl bg-slate-900/90 backdrop-blur-md border border-slate-700 shadow-lg flex items-center justify-between text-white">
-                  <div class="flex items-center gap-2.5">
-                    <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
-                    <span class="text-xs font-bold text-slate-100">أنظمة وتطبيقات متكاملة</span>
-                  </div>
-                  <span class="text-[11px] font-mono text-[#FF5E3A] font-bold">Solutions & Systems</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
+  <div class="max-w-7xl mx-auto">
+    
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      
+      <!-- Hero Content -->
+      <div class="lg:col-span-7 space-y-6 text-right">
+        
+        <!-- Badge -->
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF5F8] border border-[#E8336D]/30 text-[#E8336D] text-xs sm:text-sm font-bold shadow-xs max-w-full overflow-hidden">
+          <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#E8336D] animate-ping shrink-0"></span>
+          <span class="truncate">نحدث الفارق التقني لأعمالك</span>
+          <span class="font-mono text-slate-400 text-[11px] sm:text-xs shrink-0 border-r border-slate-200 pr-2 mr-0.5">Runx Tech</span>
         </div>
-      </section>
+
+        <!-- Main Title -->
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold font-display leading-[1.25] sm:leading-[1.2] text-[#0F172A] tracking-tight">
+          نبتكر ونبني <span class="bg-gradient-to-r from-[#FF5E3A] via-[#E8336D] to-[#7B1FA2] bg-clip-text text-transparent">حلولاً رقمية</span> فائقة الجودة والأداء
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="subtext-lead max-w-2xl text-slate-700">
+          شركة <strong class="text-[#0F172A] font-extrabold">RunX</strong> متخصصة في تصميم وتطوير المواقع المخصصة، المتاجر الإلكترونية، وتطبيقات الجوال والأنظمة السحابية برؤية هندسية احترافية تتجاوز التوقعات.
+        </p>
+
+        <!-- CTAs -->
+        <div class="flex flex-col sm:flex-row items-center gap-4 pt-2">
+          <a 
+            routerLink="/calculator" 
+            class="btn-runx-primary text-base px-8 py-3.5 w-full sm:w-auto text-center font-bold"
+          >
+            <span>احسب كلفة مشروعك الآن</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14"></path>
+              <path d="m12 5 7 7-7 7"></path>
+            </svg>
+          </a>
+
+          <a 
+            routerLink="/projects" 
+            class="btn-runx-outline text-base px-8 py-3.5 w-full sm:w-auto text-center font-semibold"
+          >
+            <span>استكشف معرض أعمالنا</span>
+          </a>
+        </div>
+
+        <!-- Key Trust Features -->
+        <div class="pt-6 grid grid-cols-3 gap-4 border-t border-slate-200/80 text-right">
+          <div>
+            <span class="block text-2xl font-bold font-mono text-[#0F172A]">100+</span>
+            <span class="subtext-muted text-slate-600 font-semibold">مشروع برمجيات مُسّلم</span>
+          </div>
+          <div>
+            <span class="block text-2xl font-bold font-mono text-[#C1662F]">99.8%</span>
+            <span class="subtext-muted text-slate-600 font-semibold">نسبة جودة الرضا</span>
+          </div>
+          <div>
+            <span class="block text-2xl font-bold font-mono text-[#0F172A]">0.8s</span>
+            <span class="subtext-muted text-slate-600 font-semibold">سرعة أداء خرافية</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Banner Image - Desktop only (in the column, no border/text/overlay) -->
+      <div class="hidden lg:block lg:col-span-5">
+        <img 
+          src="/banner.png" 
+          alt="runx tech banner" 
+          class="w-full h-auto object-cover rounded-2xl"
+          referrerpolicy="no-referrer"
+        >
+      </div>
+
+    </div>
+
+  </div>
+</section>
 
 
       <!-- BRAND ADVANTAGES -->
