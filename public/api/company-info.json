@@ -1,0 +1,20 @@
+{
+  "companyName": "runx tech",
+  "tagline": "رَن إكس لتصميم وتطوير البرمجيات والمنصات الرقمية",
+  "location": "الرياض، المملكة العربية السعودية",
+  "email": "contact@runxtech.com",
+  "phone": "+966 50 000 0000",
+  "workingHours": "الأحد - الخميس: 9:00 ص - 6:00 م",
+  "stats": {
+    "completedProjects": 65,
+    "satisfiedClients": 48,
+    "yearsOfExperience": 6,
+    "uptimeGuarantee": "99.9%"
+  },
+  "apiMeta": {
+    "version": "v1.2.0",
+    "status": "ONLINE",
+    "environment": "production",
+    "serverRegion": "me-central1 (Riyadh)"
+  }
+}

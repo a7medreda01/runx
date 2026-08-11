@@ -1,0 +1,70 @@
+// ==========================================
+// runx tech - Design System Tokens & Variables
+// Light Premium Theme - Brand Guidelines
+// ==========================================
+
+$primary-navy: #1E2A4A;
+$primary-dark: #0F172A;
+$primary-canvas: #FFFFFF;
+$secondary-canvas: #F8FAFC;
+
+$surface-card: #FFFFFF;
+$surface-glass: rgba(255, 255, 255, 0.9);
+$surface-overlay: rgba(15, 23, 42, 0.6);
+
+$accent-copper: #C1662F;
+$accent-hover: #A8521F;
+$accent-warm: #D97738;
+$accent-light: #FDF6F0;
+$accent-glow: rgba(193, 102, 47, 0.15);
+
+$text-title: #0F172A;
+$text-body: #334155;
+$text-muted: #64748B;
+$text-light: #94A3B8;
+
+$border-subtle: #E2E8F0;
+$border-accent: rgba(193, 102, 47, 0.3);
+
+$font-display: 'El Messiri', 'Tajawal', serif;
+$font-body: 'Tajawal', system-ui, -apple-system, sans-serif;
+$font-mono: 'JetBrains Mono', monospace;
+
+:root {
+  --color-primary-navy: #{$primary-navy};
+  --color-primary-dark: #{$primary-dark};
+  --color-primary-canvas: #{$primary-canvas};
+  --color-secondary-canvas: #{$secondary-canvas};
+
+  --color-surface-card: #{$surface-card};
+  --color-surface-glass: #{$surface-glass};
+  --color-surface-overlay: #{$surface-overlay};
+
+  --color-accent-copper: #{$accent-copper};
+  --color-accent-hover: #{$accent-hover};
+  --color-accent-warm: #{$accent-warm};
+  --color-accent-light: #{$accent-light};
+  --color-accent-glow: #{$accent-glow};
+
+  --color-text-title: #{$text-title};
+  --color-text-body: #{$text-body};
+  --color-text-muted: #{$text-muted};
+  --color-text-light: #{$text-light};
+
+  --color-border-subtle: #{$border-subtle};
+  --color-border-accent: #{$border-accent};
+
+  --font-display: #{$font-display};
+  --font-body: #{$font-body};
+  --font-mono: #{$font-mono};
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  --shadow-hover: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  --shadow-accent-glow: 0 10px 25px -5px rgba(193, 102, 47, 0.2);
+}
+

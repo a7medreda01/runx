@@ -1,0 +1,8 @@
+{
+  "name": "Runx tech",
+  "description": "Runx Tech - شركة متخصصة في تصميم وتطوير البرمجيات، المواقع الإلكترونية، المتاجر المخصصة، وتطبيقات الجوال والحلول الرقمية.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

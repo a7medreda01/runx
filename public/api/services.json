@@ -1,0 +1,92 @@
+[
+  {
+    "id": "web-dev",
+    "title": "تصميم وتطوير المواقع والمنصات",
+    "subtitle": "م مواقع تعريفية، منصات تفاعلية، ومتاجر إلكترونية حديثة",
+    "icon": "code",
+    "bootstrapIcon": "bi-code-slash",
+    "imageUrl": "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80",
+    "description": "نمتلك في runx tech خبرة واسعة في ابتكار مواقع متكاملة تجمع بين السرعة الفائقة، الأمان العالي، والتصميم الاستثنائي المتوافق مع كافة الشاشات وأجهزة الجوال.",
+    "features": [
+      "تصميم مخصص 100% وفق دليل هوية منشأتك",
+      "سرعة أداء وأرشفة محركات البحث SEO احترافية",
+      "لوحة تحكم سهلة لإدارة المحتوى والمنتجات",
+      "ربط بوابات الدفع وشبكات التوصيل الذكية",
+      "حماية سحابية وتشفير كامل للبيانات"
+    ],
+    "technologies": ["Angular", "TypeScript", "Tailwind CSS", "Node.js", "PostgreSQL"],
+    "priceStart": "يبدأ من 2,500 $"
+  },
+  {
+    "id": "mobile-app",
+    "title": "برمجة تطبيقات الجوال الذكية",
+    "subtitle": "تطبيقات iOS و Android عالية الكفاءة والسلاسة",
+    "icon": "smartphone",
+    "bootstrapIcon": "bi-phone-flip",
+    "imageUrl": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=600&q=80",
+    "description": "نطور تطبيقات جوال ذكية تتفوق في المتاجر الرقمية ببرمجة متينة وتجربة استخدام خالية من العيوب لتسهيل التواصل المباشر مع عملائك.",
+    "features": [
+      "برمجة متكاملة لنظامي iOS و Android",
+      "إشعارات فورية وتنبيهات مخصصة للمستخدمين",
+      "ربط خرائط وتتبع جغرافي لحظي",
+      "دعم العمل أوفلاين والمزامنة السريعة",
+      "رفع وتسليم التطبيق على App Store و Google Play"
+    ],
+    "technologies": ["Flutter", "React Native", "Firebase", "REST APIs"],
+    "priceStart": "يبدأ من 4,000 $"
+  },
+  {
+    "id": "ui-ux",
+    "title": "تصميم واجهات وتجربة المستخدم UI/UX",
+    "subtitle": "دراسة وتصميم تجارب رقمية جذابة وسهلة الاستخدام",
+    "icon": "palette",
+    "bootstrapIcon": "bi-vector-pen",
+    "imageUrl": "https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=600&q=80",
+    "description": "نقوم بتحويل أفكارك إلى واجهات بصرية ساحرة ومدروسة سيكولوجياً لزيادة تفاعل المستخدمين وتحسين معدلات التحويل للشركات.",
+    "features": [
+      "دراسة سلوك المستهدفين ورسم رحلة المستخدم",
+      "نماذج تفاعلية تجريبية (Prototypes)",
+      "بناء أنظمة تصميم (Design Systems) قابلة للتوسع",
+      "اختبار القابلية للاستخدام وتسهيل الوصول A11y",
+      "تسليم ملفات أصلية متكاملة للمطورين"
+    ],
+    "technologies": ["Figma", "Design Systems", "Micro-interactions", "Prototyping"],
+    "priceStart": "يبدأ من 1,500 $"
+  },
+  {
+    "id": "cloud-saas",
+    "title": "الأنظمة السحابية والحلول المخصصة SaaS",
+    "subtitle": "أنظمة ERP، CRM، وأتمتة العمليات للشركات والمؤسسات",
+    "icon": "cloud",
+    "bootstrapIcon": "bi-cloud-check-fill",
+    "imageUrl": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80",
+    "description": "نبني أنظمة سحابية مخصصة لإدارة موارد الشركات، الفواتير، المبيعات، والعمليات المعقدة بكفاءة تشغيلية متناهية.",
+    "features": [
+      "معمارية سحابية مرنة قابلة للتوسع بدون توقف",
+      "لوحات قيادة إحصائية وتقارير ذكاء أعمال",
+      "ربط مع الأنظمة الخارجية عبر APIs آمنة",
+      "نسخ احتياطي تلقائي ونظام أمان متقدم",
+      "إدارة صلاحيات مستخدمين متعددة المستويات"
+    ],
+    "technologies": ["Docker", "Node.js", "PostgreSQL", "Redis", "AWS"],
+    "priceStart": "يبدأ من 5,000 $"
+  },
+  {
+    "id": "devops-security",
+    "title": "إدارة السيرفرات والأمن السبراني",
+    "subtitle": "حماية المنصات، تسريع الأداء، والاستضافة المدارة",
+    "icon": "shield-check",
+    "bootstrapIcon": "bi-shield-lock-fill",
+    "imageUrl": "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=600&q=80",
+    "description": "نضمن استقرار موقعك أو نظامك على مدار الساعة مع مراقبة أمنية وحماية من الهجمات لتوفير أعلى معدل توافر بالخدمة (99.9%).",
+    "features": [
+      "تهيئة سيرفرات عالية الكفاءة Cloud Run / VPS",
+      "شهادات أمان SSL وتشفير اتصالات",
+      "فحص الثغرات الدورية ومنع الاختراق",
+      "مراقبة فورية للضغط والتطوير الأوتوماتيكي",
+      "دعم فني وطوارئ على مدار 24 ساعة"
+    ],
+    "technologies": ["Cloudflare", "Linux", "Nginx", "SSL", "CyberSecurity"],
+    "priceStart": "يبدأ من 800 $"
+  }
+]
