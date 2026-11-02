@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CompanyService } from '../../../Services/company.service';
@@ -30,7 +30,10 @@ export class CompanyManageComponent implements OnInit {
   logoPreview: string | null = null;
   coverPreview: string | null = null;
 
-  constructor(private companySvc: CompanyService) {}
+  constructor(
+    private companySvc: CompanyService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.loadCompany();
@@ -38,6 +41,7 @@ export class CompanyManageComponent implements OnInit {
 
   loadCompany(): void {
     this.isLoading = true;
+    this.cdr.markForCheck();
     this.companySvc.getAll().subscribe({
       next: (res) => {
         if (res.succeeded && res.data && res.data.length > 0) {
@@ -53,11 +57,13 @@ export class CompanyManageComponent implements OnInit {
           this.errorMessage = 'لم يتم العثور على بيانات الشركة';
         }
         this.isLoading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.errorMessage = 'حدث خطأ أثناء تحميل بيانات الشركة';
         this.isLoading = false;
         console.error(err);
+        this.cdr.markForCheck();
       }
     });
   }
@@ -67,7 +73,10 @@ export class CompanyManageComponent implements OnInit {
     if (file) {
       this.selectedLogo = file;
       const reader = new FileReader();
-      reader.onload = (e: any) => this.logoPreview = e.target.result;
+      reader.onload = (e: any) => {
+        this.logoPreview = e.target.result;
+        this.cdr.markForCheck();
+      };
       reader.readAsDataURL(file);
     }
   }
@@ -77,17 +86,21 @@ export class CompanyManageComponent implements OnInit {
     if (file) {
       this.selectedCover = file;
       const reader = new FileReader();
-      reader.onload = (e: any) => this.coverPreview = e.target.result;
+      reader.onload = (e: any) => {
+        this.coverPreview = e.target.result;
+        this.cdr.markForCheck();
+      };
       reader.readAsDataURL(file);
     }
   }
 
   onSubmit(): void {
-    if (!this.company) return;
+    if (!this.company || this.isSaving) return;
 
     this.isSaving = true;
     this.successMessage = '';
     this.errorMessage = '';
+    this.cdr.markForCheck();
 
     const form: CompanyUpdateForm = {
       Name: this.name,
@@ -111,11 +124,13 @@ export class CompanyManageComponent implements OnInit {
           this.errorMessage = res.message || 'فشل التحديث';
         }
         this.isSaving = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.errorMessage = 'حدث خطأ أثناء حفظ التغييرات';
         this.isSaving = false;
         console.error(err);
+        this.cdr.markForCheck();
       }
     });
   }

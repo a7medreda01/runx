@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CompanyService } from '../../../Services/company.service';
@@ -46,7 +46,8 @@ export class ContactSocialManageComponent implements OnInit {
   constructor(
     private companySvc: CompanyService,
     private contactInfoSvc: ContactInfoService,
-    private socialMediaSvc: SocialMediaService
+    private socialMediaSvc: SocialMediaService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -56,6 +57,7 @@ export class ContactSocialManageComponent implements OnInit {
 
   loadContactInfo(): void {
     this.isLoadingContact = true;
+    this.cdr.markForCheck();
     this.companySvc.getAll().subscribe({
       next: (res) => {
         if (res.succeeded && res.data && res.data.length > 0) {
@@ -71,38 +73,47 @@ export class ContactSocialManageComponent implements OnInit {
           }
         }
         this.isLoadingContact = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.contactError = 'فشل تحميل بيانات الاتصال';
         this.isLoadingContact = false;
         console.error(err);
+        this.cdr.markForCheck();
       }
     });
   }
 
   loadSocialMedia(): void {
     this.isLoadingSocial = true;
+    this.cdr.markForCheck();
     this.socialMediaSvc.getAll({ PageSize: 100 }).subscribe({
       next: (res) => {
         if (res.succeeded) {
           this.socialLinks = res.data.items;
         }
         this.isLoadingSocial = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.socialError = 'فشل تحميل روابط التواصل الاجتماعي';
         this.isLoadingSocial = false;
         console.error(err);
+        this.cdr.markForCheck();
       }
     });
   }
 
   onSubmitContact(): void {
+    if (this.isSavingContact) return;
+
+    this.isSavingContact = true;
+    this.contactSuccess = '';
+    this.contactError = '';
+    this.cdr.markForCheck();
+
     if (!this.contactInfo) {
       // If contactInfo doesn't exist, create it
-      this.isSavingContact = true;
-      this.contactSuccess = '';
-      this.contactError = '';
       const body: ContactInfoRequest = {
         id: 0,
         phone: this.phone,
@@ -121,19 +132,17 @@ export class ContactSocialManageComponent implements OnInit {
             this.contactError = res.message || 'فشل الحفظ';
           }
           this.isSavingContact = false;
+          this.cdr.markForCheck();
         },
         error: (err) => {
           this.contactError = 'حدث خطأ أثناء حفظ البيانات';
           this.isSavingContact = false;
           console.error(err);
+          this.cdr.markForCheck();
         }
       });
       return;
     }
-
-    this.isSavingContact = true;
-    this.contactSuccess = '';
-    this.contactError = '';
 
     const requestBody: ContactInfoRequest = {
       id: this.contactInfo.id,
@@ -154,11 +163,13 @@ export class ContactSocialManageComponent implements OnInit {
           this.contactError = res.message || 'فشل تحديث البيانات';
         }
         this.isSavingContact = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.contactError = 'حدث خطأ أثناء تحديث البيانات';
         this.isSavingContact = false;
         console.error(err);
+        this.cdr.markForCheck();
       }
     });
   }
@@ -172,6 +183,7 @@ export class ContactSocialManageComponent implements OnInit {
     this.isSocialFormOpen = true;
     this.socialSuccess = '';
     this.socialError = '';
+    this.cdr.markForCheck();
   }
 
   openEditSocial(social: SocialMedia): void {
@@ -182,18 +194,21 @@ export class ContactSocialManageComponent implements OnInit {
     this.isSocialFormOpen = true;
     this.socialSuccess = '';
     this.socialError = '';
+    this.cdr.markForCheck();
   }
 
   closeSocialForm(): void {
     this.isSocialFormOpen = false;
+    this.cdr.markForCheck();
   }
 
   onSubmitSocial(): void {
-    if (!this.socialPlatform || !this.socialUrl) return;
+    if (!this.socialPlatform || !this.socialUrl || this.isSavingSocial) return;
 
     this.isSavingSocial = true;
     this.socialSuccess = '';
     this.socialError = '';
+    this.cdr.markForCheck();
 
     const body: SocialMediaRequest = {
       id: this.editingSocialId || 0,
@@ -213,11 +228,13 @@ export class ContactSocialManageComponent implements OnInit {
             this.socialError = res.message || 'فشل التعديل';
           }
           this.isSavingSocial = false;
+          this.cdr.markForCheck();
         },
         error: (err) => {
           this.socialError = 'حدث خطأ أثناء تعديل الرابط';
           this.isSavingSocial = false;
           console.error(err);
+          this.cdr.markForCheck();
         }
       });
     } else {
@@ -231,11 +248,13 @@ export class ContactSocialManageComponent implements OnInit {
             this.socialError = res.message || 'فشل الإضافة';
           }
           this.isSavingSocial = false;
+          this.cdr.markForCheck();
         },
         error: (err) => {
           this.socialError = 'حدث خطأ أثناء إضافة الرابط';
           this.isSavingSocial = false;
           console.error(err);
+          this.cdr.markForCheck();
         }
       });
     }
@@ -248,6 +267,7 @@ export class ContactSocialManageComponent implements OnInit {
 
     this.socialSuccess = '';
     this.socialError = '';
+    this.cdr.markForCheck();
 
     this.socialMediaSvc.delete(id).subscribe({
       next: (res) => {
@@ -257,10 +277,12 @@ export class ContactSocialManageComponent implements OnInit {
         } else {
           this.socialError = res.message || 'فشل حذف الرابط';
         }
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.socialError = 'حدث خطأ أثناء حذف الرابط';
         console.error(err);
+        this.cdr.markForCheck();
       }
     });
   }

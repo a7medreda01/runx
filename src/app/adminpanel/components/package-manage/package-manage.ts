@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PackageService } from '../../../Services/package.service';
@@ -34,7 +34,10 @@ export class PackageManageComponent implements OnInit {
   selectedImage: File | null = null;
   imagePreview: string | null = null;
 
-  constructor(private packageSvc: PackageService) {}
+  constructor(
+    private packageSvc: PackageService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.loadPackages();
@@ -42,6 +45,7 @@ export class PackageManageComponent implements OnInit {
 
   loadPackages(): void {
     this.isLoading = true;
+    this.cdr.markForCheck();
     this.packageSvc.getAll({ PageSize: 100 }).subscribe({
       next: (res) => {
         if (res.succeeded) {
@@ -50,11 +54,13 @@ export class PackageManageComponent implements OnInit {
           this.errorMessage = res.message || 'فشل تحميل الباقات';
         }
         this.isLoading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.errorMessage = 'حدث خطأ أثناء تحميل الباقات';
         this.isLoading = false;
         console.error(err);
+        this.cdr.markForCheck();
       }
     });
   }
@@ -64,7 +70,10 @@ export class PackageManageComponent implements OnInit {
     if (file) {
       this.selectedImage = file;
       const reader = new FileReader();
-      reader.onload = (e: any) => this.imagePreview = e.target.result;
+      reader.onload = (e: any) => {
+        this.imagePreview = e.target.result;
+        this.cdr.markForCheck();
+      };
       reader.readAsDataURL(file);
     }
   }
@@ -81,6 +90,7 @@ export class PackageManageComponent implements OnInit {
     this.isFormOpen = true;
     this.successMessage = '';
     this.errorMessage = '';
+    this.cdr.markForCheck();
   }
 
   openEditForm(pkg: Package): void {
@@ -102,14 +112,17 @@ export class PackageManageComponent implements OnInit {
     this.isFormOpen = true;
     this.successMessage = '';
     this.errorMessage = '';
+    this.cdr.markForCheck();
   }
 
   closeForm(): void {
     this.isFormOpen = false;
+    this.cdr.markForCheck();
   }
 
   addFeatureInput(): void {
     this.featuresList.push('');
+    this.cdr.markForCheck();
   }
 
   removeFeatureInput(index: number): void {
@@ -118,6 +131,7 @@ export class PackageManageComponent implements OnInit {
     } else {
       this.featuresList[0] = '';
     }
+    this.cdr.markForCheck();
   }
 
   trackByIndex(index: number, obj: any): any {
@@ -125,14 +139,18 @@ export class PackageManageComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (!this.name || this.price === null || this.price === undefined) {
-      this.errorMessage = 'الرجاء إدخال اسم الباقة وسعرها';
+    if (!this.name || this.price === null || this.price === undefined || this.isSaving) {
+      if (!this.name || this.price === null || this.price === undefined) {
+        this.errorMessage = 'الرجاء إدخال اسم الباقة وسعرها';
+        this.cdr.markForCheck();
+      }
       return;
     }
 
     this.isSaving = true;
     this.successMessage = '';
     this.errorMessage = '';
+    this.cdr.markForCheck();
 
     // Filter out empty features
     const cleanFeatures = this.featuresList.filter(f => f.trim() !== '');
@@ -160,11 +178,13 @@ export class PackageManageComponent implements OnInit {
             this.errorMessage = res.message || 'فشل تعديل الباقة';
           }
           this.isSaving = false;
+          this.cdr.markForCheck();
         },
         error: (err) => {
           this.errorMessage = 'حدث خطأ أثناء تعديل الباقة';
           this.isSaving = false;
           console.error(err);
+          this.cdr.markForCheck();
         }
       });
     } else {
@@ -179,11 +199,13 @@ export class PackageManageComponent implements OnInit {
             this.errorMessage = res.message || 'فشل إضافة الباقة';
           }
           this.isSaving = false;
+          this.cdr.markForCheck();
         },
         error: (err) => {
           this.errorMessage = 'حدث خطأ أثناء إضافة الباقة';
           this.isSaving = false;
           console.error(err);
+          this.cdr.markForCheck();
         }
       });
     }
@@ -202,10 +224,12 @@ export class PackageManageComponent implements OnInit {
         } else {
           this.errorMessage = res.message || 'فشل حذف الباقة';
         }
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.errorMessage = 'حدث خطأ أثناء حذف الباقة';
         console.error(err);
+        this.cdr.markForCheck();
       }
     });
   }

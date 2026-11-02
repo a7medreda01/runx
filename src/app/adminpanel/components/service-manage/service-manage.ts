@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ServiceService } from '../../../Services/service.service';
@@ -35,7 +35,8 @@ export class ServiceManageComponent implements OnInit {
 
   constructor(
     private serviceSvc: ServiceService,
-    private categorySvc: ServiceCategoryService
+    private categorySvc: ServiceCategoryService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -45,6 +46,7 @@ export class ServiceManageComponent implements OnInit {
 
   loadServices(): void {
     this.isLoading = true;
+    this.cdr.markForCheck();
     this.serviceSvc.getAll({ PageSize: 100 }).subscribe({
       next: (res) => {
         if (res.succeeded) {
@@ -53,11 +55,13 @@ export class ServiceManageComponent implements OnInit {
           this.errorMessage = res.message || 'فشل تحميل الخدمات';
         }
         this.isLoading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.errorMessage = 'حدث خطأ أثناء تحميل الخدمات';
         this.isLoading = false;
         console.error(err);
+        this.cdr.markForCheck();
       }
     });
   }
@@ -68,11 +72,18 @@ export class ServiceManageComponent implements OnInit {
         if (res.succeeded) {
           this.categories = res.data.items;
         }
+        this.cdr.markForCheck();
       },
       error: (err) => {
-        console.error('Error loading categories', err);
+        console.error(err);
+        this.cdr.markForCheck();
       }
     });
+  }
+
+  getCategoryName(id: number): string {
+    const cat = this.categories.find(c => c.id === id);
+    return cat ? cat.name : 'غير محدد';
   }
 
   onImageSelected(event: any): void {
@@ -80,7 +91,10 @@ export class ServiceManageComponent implements OnInit {
     if (file) {
       this.selectedImage = file;
       const reader = new FileReader();
-      reader.onload = (e: any) => this.imagePreview = e.target.result;
+      reader.onload = (e: any) => {
+        this.imagePreview = e.target.result;
+        this.cdr.markForCheck();
+      };
       reader.readAsDataURL(file);
     }
   }
@@ -96,6 +110,7 @@ export class ServiceManageComponent implements OnInit {
     this.isFormOpen = true;
     this.successMessage = '';
     this.errorMessage = '';
+    this.cdr.markForCheck();
   }
 
   openEditForm(svc: Service): void {
@@ -109,21 +124,27 @@ export class ServiceManageComponent implements OnInit {
     this.isFormOpen = true;
     this.successMessage = '';
     this.errorMessage = '';
+    this.cdr.markForCheck();
   }
 
   closeForm(): void {
     this.isFormOpen = false;
+    this.cdr.markForCheck();
   }
 
   onSubmit(): void {
-    if (!this.name || !this.categoryId) {
-      this.errorMessage = 'الرجاء تعبئة الحقول المطلوبة واختيار القسم';
+    if (!this.name || !this.categoryId || this.isSaving) {
+      if (!this.name || !this.categoryId) {
+        this.errorMessage = 'الرجاء تعبئة الحقول المطلوبة واختيار القسم';
+        this.cdr.markForCheck();
+      }
       return;
     }
 
     this.isSaving = true;
     this.successMessage = '';
     this.errorMessage = '';
+    this.cdr.markForCheck();
 
     const form: ServiceForm = {
       Name: this.name,
@@ -147,11 +168,13 @@ export class ServiceManageComponent implements OnInit {
             this.errorMessage = res.message || 'فشل تعديل الخدمة';
           }
           this.isSaving = false;
+          this.cdr.markForCheck();
         },
         error: (err) => {
           this.errorMessage = 'حدث خطأ أثناء تعديل الخدمة';
           this.isSaving = false;
           console.error(err);
+          this.cdr.markForCheck();
         }
       });
     } else {
@@ -166,11 +189,13 @@ export class ServiceManageComponent implements OnInit {
             this.errorMessage = res.message || 'فشل إضافة الخدمة';
           }
           this.isSaving = false;
+          this.cdr.markForCheck();
         },
         error: (err) => {
           this.errorMessage = 'حدث خطأ أثناء إضافة الخدمة';
           this.isSaving = false;
           console.error(err);
+          this.cdr.markForCheck();
         }
       });
     }
@@ -189,10 +214,12 @@ export class ServiceManageComponent implements OnInit {
         } else {
           this.errorMessage = res.message || 'فشل حذف الخدمة';
         }
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.errorMessage = 'حدث خطأ أثناء حذف الخدمة';
         console.error(err);
+        this.cdr.markForCheck();
       }
     });
   }

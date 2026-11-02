@@ -136,10 +136,12 @@ export class AdminPanelComponent implements OnInit {
   switchTab(tab: string): void {
     this.activeTab.set(tab);
     this.mobileSidebarOpen.set(false);
+    this.router.navigate([], { queryParams: { tab }, queryParamsHandling: 'merge' });
     
     if (tab === 'overview') {
       this.loadStats();
     }
+    this.cdr.markForCheck();
   }
 
   toggleMobileSidebar(): void {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ServiceCategoryService } from '../../../Services/service-category.service';
@@ -27,7 +27,10 @@ export class CategoryManageComponent implements OnInit {
   name = '';
   description = '';
 
-  constructor(private categorySvc: ServiceCategoryService) {}
+  constructor(
+    private categorySvc: ServiceCategoryService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.loadCategories();
@@ -35,6 +38,7 @@ export class CategoryManageComponent implements OnInit {
 
   loadCategories(): void {
     this.isLoading = true;
+    this.cdr.markForCheck();
     this.categorySvc.getAll({ PageSize: 100 }).subscribe({
       next: (res) => {
         if (res.succeeded) {
@@ -43,11 +47,13 @@ export class CategoryManageComponent implements OnInit {
           this.errorMessage = res.message || 'فشل تحميل التصنيفات';
         }
         this.isLoading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.errorMessage = 'حدث خطأ أثناء تحميل التصنيفات';
         this.isLoading = false;
         console.error(err);
+        this.cdr.markForCheck();
       }
     });
   }
@@ -60,6 +66,7 @@ export class CategoryManageComponent implements OnInit {
     this.isFormOpen = true;
     this.successMessage = '';
     this.errorMessage = '';
+    this.cdr.markForCheck();
   }
 
   openEditForm(cat: ServiceCategory): void {
@@ -70,18 +77,21 @@ export class CategoryManageComponent implements OnInit {
     this.isFormOpen = true;
     this.successMessage = '';
     this.errorMessage = '';
+    this.cdr.markForCheck();
   }
 
   closeForm(): void {
     this.isFormOpen = false;
+    this.cdr.markForCheck();
   }
 
   onSubmit(): void {
-    if (!this.name) return;
+    if (!this.name || this.isSaving) return;
 
     this.isSaving = true;
     this.successMessage = '';
     this.errorMessage = '';
+    this.cdr.markForCheck();
 
     const body: ServiceCategoryRequest = {
       id: this.editingId || 0,
@@ -101,11 +111,13 @@ export class CategoryManageComponent implements OnInit {
             this.errorMessage = res.message || 'فشل تعديل التصنيف';
           }
           this.isSaving = false;
+          this.cdr.markForCheck();
         },
         error: (err) => {
           this.errorMessage = 'حدث خطأ أثناء تعديل التصنيف';
           this.isSaving = false;
           console.error(err);
+          this.cdr.markForCheck();
         }
       });
     } else {
@@ -120,11 +132,13 @@ export class CategoryManageComponent implements OnInit {
             this.errorMessage = res.message || 'فشل إضافة التصنيف';
           }
           this.isSaving = false;
+          this.cdr.markForCheck();
         },
         error: (err) => {
           this.errorMessage = 'حدث خطأ أثناء إضافة التصنيف';
           this.isSaving = false;
           console.error(err);
+          this.cdr.markForCheck();
         }
       });
     }
@@ -143,10 +157,12 @@ export class CategoryManageComponent implements OnInit {
         } else {
           this.errorMessage = res.message || 'فشل حذف التصنيف';
         }
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.errorMessage = 'حدث خطأ أثناء حذف التصنيف';
         console.error(err);
+        this.cdr.markForCheck();
       }
     });
   }

@@ -390,6 +390,8 @@ export class ProjectEditComponent implements OnInit {
 
   // Submit / Save
   onSubmit(): void {
+    if (this.isSaving || this.isLoading) return;
+
     if (!this.name.trim()) {
       this.errorMessage = 'الرجاء إدخال اسم المشروع';
       this.cdr.markForCheck();
