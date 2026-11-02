@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -46,11 +46,13 @@ export interface EstimateSubmissionItem {
   selector: 'app-calculator-manage',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './calculator-manage.html'
+  templateUrl: './calculator-manage.html',
+  styleUrl: './calculator-manage.css'
 })
 export class CalculatorManageComponent implements OnInit {
   private http = inject(HttpClient);
   public estimatorSvc = inject(EstimatorService);
+  private cdr = inject(ChangeDetectorRef);
 
   public activeTab = signal<'types' | 'addons' | 'estimates'>('types');
 
@@ -60,6 +62,7 @@ export class CalculatorManageComponent implements OnInit {
   public estimates = signal<EstimateSubmissionItem[]>([]);
   public selectedEstimateForModal = signal<EstimateSubmissionItem | null>(null);
   public isLoading = signal<boolean>(false);
+  public isSaving = signal<boolean>(false);
 
   // Forms Modal State
   public showTypeModal = signal<boolean>(false);
@@ -109,14 +112,19 @@ export class CalculatorManageComponent implements OnInit {
   // --- PROJECT TYPES ---
   public loadTypes(): void {
     this.isLoading.set(true);
+    this.cdr.markForCheck();
     this.http.get<any>(`${environment.apiBaseUrl}/calculator/admin/types`).subscribe({
       next: (res) => {
         this.isLoading.set(false);
         if (res.succeeded) {
           this.projectTypes.set(res.data);
         }
+        this.cdr.markForCheck();
       },
-      error: () => this.isLoading.set(false)
+      error: () => {
+        this.isLoading.set(false);
+        this.cdr.markForCheck();
+      }
     });
   }
 
@@ -129,29 +137,41 @@ export class CalculatorManageComponent implements OnInit {
       this.typeForm = this.getEmptyTypeForm();
     }
     this.showTypeModal.set(true);
+    this.cdr.markForCheck();
   }
 
   public saveType(): void {
-    if (!this.typeForm.title) return;
-    this.isLoading.set(true);
+    if (!this.typeForm.title || this.isSaving()) return;
+    this.isSaving.set(true);
+    this.cdr.markForCheck();
 
     if (this.isEditingType() && this.typeForm.id) {
       this.http.put<any>(`${environment.apiBaseUrl}/calculator/admin/types/${this.typeForm.id}`, this.typeForm).subscribe({
         next: () => {
+          this.isSaving.set(false);
           this.showTypeModal.set(false);
           this.loadTypes();
           this.estimatorSvc.fetchOptionsFromApi();
+          this.cdr.markForCheck();
         },
-        error: () => this.isLoading.set(false)
+        error: () => {
+          this.isSaving.set(false);
+          this.cdr.markForCheck();
+        }
       });
     } else {
       this.http.post<any>(`${environment.apiBaseUrl}/calculator/admin/types`, this.typeForm).subscribe({
         next: () => {
+          this.isSaving.set(false);
           this.showTypeModal.set(false);
           this.loadTypes();
           this.estimatorSvc.fetchOptionsFromApi();
+          this.cdr.markForCheck();
         },
-        error: () => this.isLoading.set(false)
+        error: () => {
+          this.isSaving.set(false);
+          this.cdr.markForCheck();
+        }
       });
     }
   }
@@ -162,6 +182,7 @@ export class CalculatorManageComponent implements OnInit {
       next: () => {
         this.loadTypes();
         this.estimatorSvc.fetchOptionsFromApi();
+        this.cdr.markForCheck();
       }
     });
   }
@@ -169,14 +190,19 @@ export class CalculatorManageComponent implements OnInit {
   // --- ADDONS ---
   public loadAddons(): void {
     this.isLoading.set(true);
+    this.cdr.markForCheck();
     this.http.get<any>(`${environment.apiBaseUrl}/calculator/admin/addons`).subscribe({
       next: (res) => {
         this.isLoading.set(false);
         if (res.succeeded) {
           this.addons.set(res.data);
         }
+        this.cdr.markForCheck();
       },
-      error: () => this.isLoading.set(false)
+      error: () => {
+        this.isLoading.set(false);
+        this.cdr.markForCheck();
+      }
     });
   }
 
@@ -189,29 +215,41 @@ export class CalculatorManageComponent implements OnInit {
       this.addonForm = this.getEmptyAddonForm();
     }
     this.showAddonModal.set(true);
+    this.cdr.markForCheck();
   }
 
   public saveAddon(): void {
-    if (!this.addonForm.title) return;
-    this.isLoading.set(true);
+    if (!this.addonForm.title || this.isSaving()) return;
+    this.isSaving.set(true);
+    this.cdr.markForCheck();
 
     if (this.isEditingAddon() && this.addonForm.id) {
       this.http.put<any>(`${environment.apiBaseUrl}/calculator/admin/addons/${this.addonForm.id}`, this.addonForm).subscribe({
         next: () => {
+          this.isSaving.set(false);
           this.showAddonModal.set(false);
           this.loadAddons();
           this.estimatorSvc.fetchOptionsFromApi();
+          this.cdr.markForCheck();
         },
-        error: () => this.isLoading.set(false)
+        error: () => {
+          this.isSaving.set(false);
+          this.cdr.markForCheck();
+        }
       });
     } else {
       this.http.post<any>(`${environment.apiBaseUrl}/calculator/admin/addons`, this.addonForm).subscribe({
         next: () => {
+          this.isSaving.set(false);
           this.showAddonModal.set(false);
           this.loadAddons();
           this.estimatorSvc.fetchOptionsFromApi();
+          this.cdr.markForCheck();
         },
-        error: () => this.isLoading.set(false)
+        error: () => {
+          this.isSaving.set(false);
+          this.cdr.markForCheck();
+        }
       });
     }
   }
@@ -222,6 +260,7 @@ export class CalculatorManageComponent implements OnInit {
       next: () => {
         this.loadAddons();
         this.estimatorSvc.fetchOptionsFromApi();
+        this.cdr.markForCheck();
       }
     });
   }
@@ -233,16 +272,19 @@ export class CalculatorManageComponent implements OnInit {
         if (res.succeeded) {
           this.estimates.set(res.data);
         }
+        this.cdr.markForCheck();
       }
     });
   }
 
   public openEstimateDetails(est: EstimateSubmissionItem): void {
     this.selectedEstimateForModal.set(est);
+    this.cdr.markForCheck();
   }
 
   public closeEstimateDetails(): void {
     this.selectedEstimateForModal.set(null);
+    this.cdr.markForCheck();
   }
 
   public parseAddons(jsonStr: string): string[] {
@@ -261,7 +303,10 @@ export class CalculatorManageComponent implements OnInit {
   public deleteEstimate(id: number): void {
     if (!confirm('هل أنت متأكد من حذف هذا الطلب من السجل؟')) return;
     this.http.delete<any>(`${environment.apiBaseUrl}/calculator/admin/estimates/${id}`).subscribe({
-      next: () => this.loadEstimates()
+      next: () => {
+        this.loadEstimates();
+        this.cdr.markForCheck();
+      }
     });
   }
 }

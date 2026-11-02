@@ -1,43 +1,34 @@
-﻿<div class="manage-container space-y-6">
+<div class="manage-container animate-fade-in">
 
   <!-- Header -->
-  <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
+  <div class="header-section flex-header">
     <div>
-      <h2 class="text-xl font-bold font-display text-slate-900">إدارة حاسبة الأسعار والخدمات</h2>
-      <p class="text-xs text-slate-500">التحكم الكامل بأنواع المشاريع، الإضافات، الأسعار بالدولار والجنيه، وطلبات العملاء.</p>
+      <h3>حاسبة الأسعار والطلبات التقديرية</h3>
+      <p>التحكم الكامل بأنواع المشاريع، الإضافات، الأسعار بالدولار والجنيه، ومتابعة طلبات العملاء</p>
     </div>
 
     <!-- Tabs Navigation -->
-    <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
+    <div class="calc-nav-tabs">
       <button 
         (click)="activeTab.set('types')"
-        class="px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer"
-        [class.bg-white]="activeTab() === 'types'"
-        [class.text-[#1E2A4A]]="activeTab() === 'types'"
-        [class.shadow-sm]="activeTab() === 'types'"
-        [class.text-slate-600]="activeTab() !== 'types'"
+        class="calc-tab-btn cursor-pointer"
+        [class.active]="activeTab() === 'types'"
       >
         <i class="bi bi-layers-fill"></i> أنواع المشاريع ({{ projectTypes().length }})
       </button>
 
       <button 
         (click)="activeTab.set('addons')"
-        class="px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer"
-        [class.bg-white]="activeTab() === 'addons'"
-        [class.text-[#1E2A4A]]="activeTab() === 'addons'"
-        [class.shadow-sm]="activeTab() === 'addons'"
-        [class.text-slate-600]="activeTab() !== 'addons'"
+        class="calc-tab-btn cursor-pointer"
+        [class.active]="activeTab() === 'addons'"
       >
-        <i class="bi bi-[#C1662F]"></i> الإضافات والميزات ({{ addons().length }})
+        <i class="bi bi-puzzle-fill"></i> الإضافات والميزات ({{ addons().length }})
       </button>
 
       <button 
         (click)="activeTab.set('estimates')"
-        class="px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer"
-        [class.bg-white]="activeTab() === 'estimates'"
-        [class.text-[#1E2A4A]]="activeTab() === 'estimates'"
-        [class.shadow-sm]="activeTab() === 'estimates'"
-        [class.text-slate-600]="activeTab() !== 'estimates'"
+        class="calc-tab-btn cursor-pointer"
+        [class.active]="activeTab() === 'estimates'"
       >
         <i class="bi bi-file-earmark-text-fill"></i> طلبات العملاء ({{ estimates().length }})
       </button>
@@ -45,353 +36,347 @@
   </div>
 
   <!-- TAB 1: PROJECT TYPES -->
-  <div *ngIf="activeTab() === 'types'" class="space-y-4">
-    <div class="flex justify-between items-center">
-      <h3 class="text-base font-bold text-slate-800">قائمة أنواع المشاريع المسجلة</h3>
-      <button (click)="openTypeModal()" class="btn-runx-primary text-xs py-2 px-4 flex items-center gap-1.5 cursor-pointer">
-        <i class="bi bi-plus-circle-fill"></i> إضافة نوع مشروع جديد
+  <div *ngIf="activeTab() === 'types'" class="animate-fade-in">
+    <div class="section-toolbar">
+      <h4>أنواع المشاريع الرقمية</h4>
+      <button (click)="openTypeModal()" class="btn-primary-sm cursor-pointer">
+        <i class="bi bi-plus-lg"></i> إضافة نوع مشروع جديد
       </button>
     </div>
 
-    <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-      <table class="w-full text-right text-xs">
-        <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
+    <div class="table-card">
+      <table class="admin-table">
+        <thead>
           <tr>
-            <th class="p-3">#</th>
-            <th class="p-3">عنوان المشروع</th>
-            <th class="p-3">الوصف</th>
-            <th class="p-3">السعر بالدولار ($)</th>
-            <th class="p-3">السعر بالجنيه (ج.م)</th>
-            <th class="p-3">أيام التنفيذ</th>
-            <th class="p-3 text-center">إجراءات</th>
+            <th style="width: 70px;">#</th>
+            <th>نوع المشروع</th>
+            <th>الوصف</th>
+            <th>السعر ($ دولار)</th>
+            <th>السعر (ج.م جنيه)</th>
+            <th>أيام التنفيذ</th>
+            <th style="width: 140px; text-align: center;">العمليات</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-slate-100">
-          @for (pt of projectTypes(); track pt.id) {
-            <tr class="hover:bg-slate-50/50">
-              <td class="p-3 font-mono font-bold text-slate-400">{{ pt.id }}</td>
-              <td class="p-3 font-bold text-slate-900">{{ pt.title }}</td>
-              <td class="p-3 text-slate-600 max-w-xs truncate">{{ pt.description }}</td>
-              <td class="p-3 font-mono font-bold text-emerald-600">${{ pt.basePriceUsd }}</td>
-              <td class="p-3 font-mono font-bold text-[#C1662F]">{{ pt.basePriceEgp }} ج.م</td>
-              <td class="p-3 font-mono">{{ pt.estimatedDays }} يوم</td>
-              <td class="p-3 text-center space-x-2 space-x-reverse">
-                <button (click)="openTypeModal(pt)" class="px-2.5 py-1 bg-amber-50 text-amber-700 rounded border border-amber-200 hover:bg-amber-100 cursor-pointer">
-                  <i class="bi bi-pencil"></i> تعديل
+        <tbody>
+          <tr *ngFor="let pt of projectTypes()">
+            <td class="font-mono text-slate-400">#{{ pt.id }}</td>
+            <td>
+              <div class="font-bold text-white text-base">{{ pt.title }}</div>
+              <div class="text-xs text-slate-400 font-mono">{{ pt.code }}</div>
+            </td>
+            <td class="text-desc text-truncate" style="max-width: 250px;">{{ pt.description }}</td>
+            <td>
+              <span class="badge-usd">${{ pt.basePriceUsd }}</span>
+            </td>
+            <td>
+              <span class="badge-egp">{{ pt.basePriceEgp }} ج.م</span>
+            </td>
+            <td>
+              <span class="badge-days">{{ pt.estimatedDays }} يوم</span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button (click)="openTypeModal(pt)" class="btn-action edit" title="تعديل">
+                  <i class="bi bi-pencil-square"></i>
                 </button>
-                <button (click)="pt.id && deleteType(pt.id)" class="px-2.5 py-1 bg-rose-50 text-rose-700 rounded border border-rose-200 hover:bg-rose-100 cursor-pointer">
-                  <i class="bi bi-trash"></i> حذف
+                <button (click)="pt.id && deleteType(pt.id)" class="btn-action delete" title="حذف">
+                  <i class="bi bi-trash-fill"></i>
                 </button>
-              </td>
-            </tr>
-          } @empty {
-            <tr>
-              <td colspan="7" class="p-6 text-center text-slate-400">لا توجد أنواع مشاريع مسجلة حالياً</td>
-            </tr>
-          }
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="projectTypes().length === 0">
+            <td colspan="7" class="empty-row">لا توجد أنواع مشاريع مسجلة حالياً</td>
+          </tr>
         </tbody>
       </table>
     </div>
   </div>
 
   <!-- TAB 2: ADDON FEATURES -->
-  <div *ngIf="activeTab() === 'addons'" class="space-y-4">
-    <div class="flex justify-between items-center">
-      <h3 class="text-base font-bold text-slate-800">قائمة الإضافات والميزات المتاحة</h3>
-      <button (click)="openAddonModal()" class="btn-runx-primary text-xs py-2 px-4 flex items-center gap-1.5 cursor-pointer">
-        <i class="bi bi-plus-circle-fill"></i> إضافة ميزة جديدة
+  <div *ngIf="activeTab() === 'addons'" class="animate-fade-in">
+    <div class="section-toolbar">
+      <h4>الإضافات والميزات التكميلية المتاحة للعميل في الحاسبة</h4>
+      <button (click)="openAddonModal()" class="btn-primary-sm cursor-pointer">
+        <i class="bi bi-plus-lg"></i> إضافة ميزة جديدة
       </button>
     </div>
 
-    <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-      <table class="w-full text-right text-xs">
-        <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
+    <div class="table-card">
+      <table class="admin-table">
+        <thead>
           <tr>
-            <th class="p-3">#</th>
-            <th class="p-3">اسم الميزة</th>
-            <th class="p-3">الفئة</th>
-            <th class="p-3">السعر ($)</th>
-            <th class="p-3">السعر (ج.م)</th>
-            <th class="p-3">الأيام</th>
-            <th class="p-3 text-center">إجراءات</th>
+            <th style="width: 70px;">#</th>
+            <th>اسم الميزة الإضافية</th>
+            <th>الفئة</th>
+            <th>السعر ($ دولار)</th>
+            <th>السعر (ج.م جنيه)</th>
+            <th>المدة الإضافية</th>
+            <th style="width: 140px; text-align: center;">العمليات</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-slate-100">
-          @for (ad of addons(); track ad.id) {
-            <tr class="hover:bg-slate-50/50">
-              <td class="p-3 font-mono font-bold text-slate-400">{{ ad.id }}</td>
-              <td class="p-3 font-bold text-slate-900">{{ ad.title }}</td>
-              <td class="p-3">
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">{{ ad.category }}</span>
-              </td>
-              <td class="p-3 font-mono font-bold text-emerald-600">+${{ ad.priceUsd }}</td>
-              <td class="p-3 font-mono font-bold text-[#C1662F]">+{{ ad.priceEgp }} ج.م</td>
-              <td class="p-3 font-mono">+{{ ad.days }} يوم</td>
-              <td class="p-3 text-center space-x-2 space-x-reverse">
-                <button (click)="openAddonModal(ad)" class="px-2.5 py-1 bg-amber-50 text-amber-700 rounded border border-amber-200 hover:bg-amber-100 cursor-pointer">
-                  <i class="bi bi-pencil"></i> تعديل
+        <tbody>
+          <tr *ngFor="let ad of addons()">
+            <td class="font-mono text-slate-400">#{{ ad.id }}</td>
+            <td>
+              <div class="font-bold text-white text-base">{{ ad.title }}</div>
+              <div class="text-xs text-slate-400 font-mono">{{ ad.code }}</div>
+            </td>
+            <td>
+              <span class="badge-category">{{ ad.category }}</span>
+            </td>
+            <td>
+              <span class="badge-usd">+${{ ad.priceUsd }}</span>
+            </td>
+            <td>
+              <span class="badge-egp">+{{ ad.priceEgp }} ج.م</span>
+            </td>
+            <td>
+              <span class="badge-days">+{{ ad.days }} يوم</span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button (click)="openAddonModal(ad)" class="btn-action edit" title="تعديل الميزة">
+                  <i class="bi bi-pencil-square"></i>
                 </button>
-                <button (click)="ad.id && deleteAddon(ad.id)" class="px-2.5 py-1 bg-rose-50 text-rose-700 rounded border border-rose-200 hover:bg-rose-100 cursor-pointer">
-                  <i class="bi bi-trash"></i> حذف
+                <button (click)="ad.id && deleteAddon(ad.id)" class="btn-action delete" title="حذف الميزة">
+                  <i class="bi bi-trash-fill"></i>
                 </button>
-              </td>
-            </tr>
-          } @empty {
-            <tr>
-              <td colspan="7" class="p-6 text-center text-slate-400">لا توجد إضافات مسجلة حالياً</td>
-            </tr>
-          }
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="addons().length === 0">
+            <td colspan="7" class="empty-row">لا توجد إضافات مسجلة حالياً</td>
+          </tr>
         </tbody>
       </table>
     </div>
   </div>
 
   <!-- TAB 3: CLIENT ESTIMATES SUBMISSIONS -->
-  <div *ngIf="activeTab() === 'estimates'" class="space-y-4">
-    <div class="flex justify-between items-center">
-      <h3 class="text-base font-bold text-slate-800">سجل طلبات التقدير المرفوعة من العملاء</h3>
-      <button (click)="loadEstimates()" class="btn-runx-outline text-xs py-1.5 px-3">
-        <i class="bi bi-arrow-clockwise"></i> تحديث
+  <div *ngIf="activeTab() === 'estimates'" class="animate-fade-in">
+    <div class="section-toolbar">
+      <h4>سجل الطلبات التقديرية المرفوعة من الزوار</h4>
+      <button (click)="loadEstimates()" class="btn-secondary">
+        <i class="bi bi-arrow-clockwise"></i> تحديث السجل
       </button>
     </div>
 
-    <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-      <table class="w-full text-right text-xs">
-        <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
+    <div class="table-card">
+      <table class="admin-table">
+        <thead>
           <tr>
-            <th class="p-3">المرجع</th>
-            <th class="p-3">اسم العميل</th>
-            <th class="p-3">رقم الهاتف</th>
-            <th class="p-3">نوع المشروع</th>
-            <th class="p-3">الميزانية المقدرة</th>
-            <th class="p-3">المدة</th>
-            <th class="p-3">تاريخ الطلب</th>
-            <th class="p-3 text-center">إجراءات</th>
+            <th>المرجع</th>
+            <th>اسم العميل</th>
+            <th>رقم التواصل</th>
+            <th>نوع المشروع</th>
+            <th>الميزانية المقدرة</th>
+            <th>المدة</th>
+            <th>تاريخ الإرسال</th>
+            <th style="width: 140px; text-align: center;">العمليات</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-slate-100">
-          @for (est of estimates(); track est.id) {
-            <tr class="hover:bg-slate-50/50">
-              <td class="p-3 font-mono font-bold text-[#1E2A4A]">{{ est.estimateReference }}</td>
-              <td class="p-3 font-bold text-slate-900">{{ est.clientName || 'غير محدد' }}</td>
-              <td class="p-3 font-mono dir-ltr text-right text-indigo-600">{{ est.clientContact || '-' }}</td>
-              <td class="p-3 text-slate-800">{{ est.projectType }}</td>
-              <td class="p-3 font-mono font-bold text-[#C1662F]">{{ est.estimatedPrice }}</td>
-              <td class="p-3 font-mono">{{ est.estimatedDays }} يوم</td>
-              <td class="p-3 text-slate-500 text-[11px]">{{ est.createdAt | date:'short' }}</td>
-              <td class="p-3 text-center space-x-1.5 space-x-reverse">
-                <button (click)="openEstimateDetails(est)" class="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded border border-indigo-200 hover:bg-indigo-100 cursor-pointer font-bold">
-                  <i class="bi bi-eye-fill"></i> فتح الطلب
+        <tbody>
+          <tr *ngFor="let est of estimates()">
+            <td class="font-mono font-bold text-purple-400">{{ est.estimateReference }}</td>
+            <td class="font-bold text-white">{{ est.clientName || 'غير محدد' }}</td>
+            <td class="font-mono dir-ltr text-right text-indigo-400">{{ est.clientContact || '-' }}</td>
+            <td>{{ est.projectType }}</td>
+            <td class="font-mono font-bold text-emerald-400">{{ est.estimatedPrice }}</td>
+            <td>{{ est.estimatedDays }} يوم</td>
+            <td class="text-xs text-slate-400">{{ est.createdAt | date:'short' }}</td>
+            <td>
+              <div class="action-buttons">
+                <button (click)="openEstimateDetails(est)" class="btn-action view" title="عرض تفاصيل الطلب">
+                  <i class="bi bi-eye-fill"></i>
                 </button>
-                <button (click)="deleteEstimate(est.id)" class="px-2.5 py-1 bg-rose-50 text-rose-700 rounded border border-rose-200 hover:bg-rose-100 cursor-pointer">
-                  <i class="bi bi-trash"></i> حذف
+                <button (click)="deleteEstimate(est.id)" class="btn-action delete" title="حذف الطلب">
+                  <i class="bi bi-trash-fill"></i>
                 </button>
-              </td>
-            </tr>
-          } @empty {
-            <tr>
-              <td colspan="8" class="p-6 text-center text-slate-400">لا توجد طلبات تقدير مستلمة حتى الآن</td>
-            </tr>
-          }
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="estimates().length === 0">
+            <td colspan="8" class="empty-row">لا توجد طلبات تقديرية مستلمة حتى الآن</td>
+          </tr>
         </tbody>
       </table>
     </div>
   </div>
 
   <!-- MODAL: ADD/EDIT PROJECT TYPE -->
-  <div *ngIf="showTypeModal()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl p-6 max-w-lg w-full space-y-4 shadow-2xl border border-slate-200">
-      <h3 class="text-lg font-bold text-slate-900 border-b pb-2">
-        {{ isEditingType() ? 'تعديل نوع مشروع' : 'إضافة نوع مشروع جديد' }}
-      </h3>
+  <div *ngIf="showTypeModal()" class="modal-backdrop animate-fade-in">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4>{{ isEditingType() ? 'تعديل نوع المشروع' : 'إضافة نوع مشروع جديد' }}</h4>
+        <button (click)="showTypeModal.set(false)" class="btn-close"><i class="bi bi-x-lg"></i></button>
+      </div>
 
-      <div class="space-y-3 text-xs">
-        <div>
-          <label class="block text-slate-700 font-bold mb-1">عنوان المشروع *</label>
-          <input type="text" [(ngModel)]="typeForm.title" placeholder="مثال: تطبيق متجر إلكتروني" class="runx-input">
+      <div class="modal-body">
+        <div class="form-group">
+          <label>عنوان المشروع *</label>
+          <input type="text" [(ngModel)]="typeForm.title" placeholder="مثال: تطبيق متجر إلكتروني متكامل" />
         </div>
 
-        <div>
-          <label class="block text-slate-700 font-bold mb-1">الوصف المختصر</label>
-          <textarea [(ngModel)]="typeForm.description" rows="3" placeholder="شرح مواصفات نوع المشروع..." class="runx-input"></textarea>
+        <div class="form-group">
+          <label>الوصف والمواصفات</label>
+          <textarea [(ngModel)]="typeForm.description" rows="3" placeholder="اشرح تفاصيل ومواصفات نوع المشروع..."></textarea>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-slate-700 font-bold mb-1">السعر بالدولار ($) *</label>
-            <input type="number" [(ngModel)]="typeForm.basePriceUsd" class="runx-input">
+        <div class="two-col-grid">
+          <div class="form-group">
+            <label>السعر الأساسي ($ دولار) *</label>
+            <input type="number" [(ngModel)]="typeForm.basePriceUsd" />
           </div>
-          <div>
-            <label class="block text-slate-700 font-bold mb-1">السعر بالجنيه (ج.م) *</label>
-            <input type="number" [(ngModel)]="typeForm.basePriceEgp" class="runx-input">
+          <div class="form-group">
+            <label>السعر الأساسي (ج.م جنيه) *</label>
+            <input type="number" [(ngModel)]="typeForm.basePriceEgp" />
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-slate-700 font-bold mb-1">أيام التنفيذ التقديرية</label>
-            <input type="number" [(ngModel)]="typeForm.estimatedDays" class="runx-input">
+        <div class="two-col-grid">
+          <div class="form-group">
+            <label>مدة التنفيذ التقديرية (أيام)</label>
+            <input type="number" [(ngModel)]="typeForm.estimatedDays" />
           </div>
-          <div>
-            <label class="block text-slate-700 font-bold mb-1">أمر الترتيب</label>
-            <input type="number" [(ngModel)]="typeForm.sortOrder" class="runx-input">
+          <div class="form-group">
+            <label>أمر الترتيب</label>
+            <input type="number" [(ngModel)]="typeForm.sortOrder" />
           </div>
+        </div>
+
+        <div class="form-group">
+          <label>الأيقونة (Bootstrap Icon أو Feather)</label>
+          <input type="text" [(ngModel)]="typeForm.icon" placeholder="globe, shopping-bag, smartphone, layers" />
         </div>
       </div>
 
-      <div class="flex justify-end gap-2 pt-3 border-t">
-        <button (click)="showTypeModal.set(false)" class="btn-runx-outline text-xs px-4 py-2">إلغاء</button>
-        <button (click)="saveType()" class="btn-runx-primary text-xs px-5 py-2">حفظ التغييرات</button>
+      <div class="modal-footer">
+        <button (click)="showTypeModal.set(false)" class="btn-secondary">إلغاء</button>
+        <button (click)="saveType()" [disabled]="isSaving()" class="btn-primary">
+          <span *ngIf="!isSaving()"><i class="bi bi-save"></i> حفظ نوع المشروع</span>
+          <span *ngIf="isSaving()" class="btn-spinner"></span>
+        </button>
       </div>
     </div>
   </div>
 
   <!-- MODAL: ADD/EDIT ADDON -->
-  <div *ngIf="showAddonModal()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl p-6 max-w-lg w-full space-y-4 shadow-2xl border border-slate-200">
-      <h3 class="text-lg font-bold text-slate-900 border-b pb-2">
-        {{ isEditingAddon() ? 'تعديل ميزة إضافية' : 'إضافة ميزة إضافية جديدة' }}
-      </h3>
+  <div *ngIf="showAddonModal()" class="modal-backdrop animate-fade-in">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4>{{ isEditingAddon() ? 'تعديل ميزة إضافية' : 'إضافة ميزة إضافية جديدة' }}</h4>
+        <button (click)="showAddonModal.set(false)" class="btn-close"><i class="bi bi-x-lg"></i></button>
+      </div>
 
-      <div class="space-y-3 text-xs">
-        <div>
-          <label class="block text-slate-700 font-bold mb-1">عنوان الميزة الإضافية *</label>
-          <input type="text" [(ngModel)]="addonForm.title" placeholder="مثال: ربط بوابة دفع الفواتير" class="runx-input">
+      <div class="modal-body">
+        <div class="form-group">
+          <label>عنوان الميزة الإضافية *</label>
+          <input type="text" [(ngModel)]="addonForm.title" placeholder="مثال: ربط بوابات الدفع الإلكتروني المباشر" />
         </div>
 
-        <div>
-          <label class="block text-slate-700 font-bold mb-1">الوصف</label>
-          <textarea [(ngModel)]="addonForm.description" rows="2" placeholder="تفاصيل الميزة..." class="runx-input"></textarea>
+        <div class="form-group">
+          <label>الوصف الإيضاحي</label>
+          <textarea [(ngModel)]="addonForm.description" rows="2" placeholder="اشرح تفاصيل الميزة التي تقدمها..."></textarea>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-slate-700 font-bold mb-1">سعر الإضافة ($) *</label>
-            <input type="number" [(ngModel)]="addonForm.priceUsd" class="runx-input">
+        <div class="two-col-grid">
+          <div class="form-group">
+            <label>سعر الميزة ($ دولار) *</label>
+            <input type="number" [(ngModel)]="addonForm.priceUsd" />
           </div>
-          <div>
-            <label class="block text-slate-700 font-bold mb-1">سعر الإضافة (ج.م) *</label>
-            <input type="number" [(ngModel)]="addonForm.priceEgp" class="runx-input">
+          <div class="form-group">
+            <label>سعر الميزة (ج.م جنيه) *</label>
+            <input type="number" [(ngModel)]="addonForm.priceEgp" />
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-slate-700 font-bold mb-1">الزيادة في أيام العمل</label>
-            <input type="number" [(ngModel)]="addonForm.days" class="runx-input">
+        <div class="two-col-grid">
+          <div class="form-group">
+            <label>الزيادة في أيام العمل</label>
+            <input type="number" [(ngModel)]="addonForm.days" />
           </div>
-          <div>
-            <label class="block text-slate-700 font-bold mb-1">الفئة</label>
-            <select [(ngModel)]="addonForm.category" class="runx-input">
-              <option value="features">مميزات أساسية (features)</option>
-              <option value="integrations">ربط وتكامل (integrations)</option>
+          <div class="form-group">
+            <label>الفئة والتصنيف</label>
+            <select [(ngModel)]="addonForm.category">
+              <option value="features">مميزات ووظائف (features)</option>
+              <option value="integrations">ربط وتكاملات (integrations)</option>
               <option value="security">أمان وحماية (security)</option>
+              <option value="design">تصميم وهوية (design)</option>
+              <option value="marketing">تسويق وتحليلات (marketing)</option>
             </select>
           </div>
         </div>
+
+        <div class="form-group">
+          <label>أمر الترتيب</label>
+          <input type="number" [(ngModel)]="addonForm.sortOrder" placeholder="1" />
+        </div>
       </div>
 
-      <div class="flex justify-end gap-2 pt-3 border-t">
-        <button (click)="showAddonModal.set(false)" class="btn-runx-outline text-xs px-4 py-2">إلغاء</button>
-        <button (click)="saveAddon()" class="btn-runx-primary text-xs px-5 py-2">حفظ الميزة</button>
+      <div class="modal-footer">
+        <button (click)="showAddonModal.set(false)" class="btn-secondary">إلغاء</button>
+        <button (click)="saveAddon()" [disabled]="isSaving()" class="btn-primary">
+          <span *ngIf="!isSaving()"><i class="bi bi-save"></i> حفظ الميزة الإضافية</span>
+          <span *ngIf="isSaving()" class="btn-spinner"></span>
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: VIEW FULL ESTIMATE ORDER DETAILS -->
-  <div *ngIf="selectedEstimateForModal() as est" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl p-6 max-w-xl w-full space-y-5 shadow-2xl border border-slate-200 text-slate-800 animate-fade-in">
-      
-      <!-- Modal Header -->
-      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
-        <div class="flex items-center gap-2">
-          <span class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
-            <i class="bi bi-file-earmark-text text-lg"></i>
-          </span>
-          <div>
-            <h3 class="text-base font-bold text-slate-900">تفاصيل طلب العميل المرفوع بالكامل</h3>
-            <span class="text-xs font-mono font-bold text-indigo-600">{{ est.estimateReference }}</span>
-          </div>
-        </div>
-        <button (click)="closeEstimateDetails()" class="text-slate-400 hover:text-slate-600 text-xl font-bold p-1">&times;</button>
+  <!-- MODAL: VIEW ESTIMATE DETAILS -->
+  <div *ngIf="selectedEstimateForModal() as est" class="modal-backdrop animate-fade-in">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4>تفاصيل طلب العميل: {{ est.estimateReference }}</h4>
+        <button (click)="closeEstimateDetails()" class="btn-close"><i class="bi bi-x-lg"></i></button>
       </div>
 
-      <!-- Customer Info Card -->
-      <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2 text-xs">
-        <h4 class="font-bold text-slate-700 border-b border-slate-200 pb-1 flex items-center gap-1.5">
-          <i class="bi bi-person-fill text-indigo-600"></i> بيانات التواصل مع العميل
-        </h4>
-        <div class="grid grid-cols-2 gap-3 pt-1">
-          <div>
-            <span class="text-slate-500 block">اسم العميل:</span>
-            <span class="font-bold text-slate-900 text-sm">{{ est.clientName || 'غير محدد' }}</span>
-          </div>
-          <div>
-            <span class="text-slate-500 block">رقم الهاتف / الواتساب:</span>
-            <span class="font-mono font-bold text-indigo-600 text-sm dir-ltr text-right block">{{ est.clientContact || '-' }}</span>
-          </div>
-          <div>
-            <span class="text-slate-500 block">تاريخ إرسال الطلب:</span>
-            <span class="font-mono text-slate-700">{{ est.createdAt | date:'medium' }}</span>
-          </div>
-          <div>
-            <span class="text-slate-500 block">حالة الطلب:</span>
-            <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold text-[11px]">مؤكد من الحاسبة</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Project Specification & Addons Card -->
-      <div class="space-y-3 text-xs">
-        <div class="bg-indigo-50/50 p-3 rounded-xl border border-indigo-100 flex items-center justify-between">
-          <div>
-            <span class="text-slate-500 block text-[11px]">نوع المشروع الرقمي المختار:</span>
-            <span class="font-bold text-indigo-900 text-sm">{{ est.projectType }}</span>
-          </div>
-          <div class="text-left">
-            <span class="text-slate-500 block text-[11px]">سرعة التنفيذ:</span>
-            <span class="font-bold text-slate-800">{{ est.timeline || 'عادي' }}</span>
+      <div class="modal-body">
+        <div class="bg-white/5 p-4 rounded-xl border border-white/10 space-y-2 text-sm">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <span class="text-slate-400 block text-xs">اسم العميل:</span>
+              <span class="font-bold text-white">{{ est.clientName || 'غير محدد' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-xs">رقم الهاتف / الواتساب:</span>
+              <a [href]="'https://wa.me/' + est.clientContact" target="_blank" class="font-mono font-bold text-emerald-400 dir-ltr inline-block">
+                {{ est.clientContact || '-' }}
+              </a>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-xs">نوع المشروع المختار:</span>
+              <span class="font-bold text-purple-300">{{ est.projectType }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-xs">الجدول الزمني:</span>
+              <span class="font-bold text-slate-200">{{ est.timeline }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-xs">السعر المقدر:</span>
+              <span class="font-mono font-bold text-emerald-400 text-base">{{ est.estimatedPrice }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-xs">المدة التقديرية:</span>
+              <span class="font-mono text-slate-200">{{ est.estimatedDays }} يوم</span>
+            </div>
           </div>
         </div>
 
         <div>
-          <span class="font-bold text-slate-700 block mb-1.5">الإضافات والميزات المطلوبة:</span>
+          <label class="block text-slate-300 font-bold mb-2 text-xs">الميزات والإضافات المطلوبة في الطلب:</label>
           <div class="flex flex-wrap gap-1.5">
-            @for (addon of parseAddons(est.addonsJson); track $index) {
-              <span class="px-2.5 py-1 bg-slate-100 text-slate-800 rounded-lg border border-slate-200 font-medium">
-                • {{ addon }}
-              </span>
-            } @empty {
-              <span class="text-slate-400 italic">لم يتم اختيار إضافات إضافية</span>
-            }
+            <span *ngFor="let add of parseAddons(est.addonsJson)" class="badge-category">
+              <i class="bi bi-check2"></i> {{ add }}
+            </span>
           </div>
         </div>
       </div>
 
-      <!-- Budget & Timeline Summary -->
-      <div class="bg-amber-50/60 p-4 rounded-xl border border-amber-200 flex items-center justify-between">
-        <div>
-          <span class="text-slate-500 block text-xs">الميزانية التقديرية الإجمالية:</span>
-          <span class="text-2xl font-bold font-mono text-[#C1662F]">{{ est.estimatedPrice }}</span>
-        </div>
-        <div class="text-left">
-          <span class="text-slate-500 block text-xs">مدة التسليم المقدرة:</span>
-          <span class="text-lg font-bold font-mono text-slate-900">{{ est.estimatedDays }} يوم عمل</span>
-        </div>
+      <div class="modal-footer">
+        <button (click)="closeEstimateDetails()" class="btn-secondary">إغلاق</button>
       </div>
-
-      <!-- Actions -->
-      <div class="flex justify-between items-center pt-2 border-t border-slate-200">
-        <a 
-          [href]="'https://wa.me/' + (est.clientContact ? est.clientContact.replace('+', '').replace(' ', '') : '')" 
-          target="_blank" 
-          class="btn-runx-primary text-xs px-4 py-2 flex items-center gap-1.5"
-        >
-          <i class="bi bi-whatsapp text-sm"></i> مراسلة العميل عبر الواتساب
-        </a>
-        <button (click)="closeEstimateDetails()" class="btn-runx-outline text-xs px-4 py-2">إغلاق</button>
-      </div>
-
     </div>
   </div>
 

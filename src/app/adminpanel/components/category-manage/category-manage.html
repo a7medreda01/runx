@@ -1,8 +1,8 @@
 <div class="manage-container animate-fade-in">
   <div class="header-section flex-header">
     <div>
-      <h3>تصنيفات الخدمات</h3>
-      <p>إدارة تصنيفات الخدمات والمشاريع الموجودة في الموقع</p>
+      <h3>تصنيفات الخدمات والمشاريع</h3>
+      <p>تنظيم وهيكلة أقسام الخدمات ومطابقتها مع معرض المشاريع في الموقع</p>
     </div>
     <button (click)="openAddForm()" class="btn-primary-sm">
       <i class="bi bi-plus-lg"></i> إضافة تصنيف جديد
@@ -27,30 +27,38 @@
     <table class="admin-table">
       <thead>
         <tr>
-          <th style="width: 80px;">الرقم</th>
+          <th style="width: 70px;">#</th>
           <th>اسم التصنيف</th>
           <th>الوصف</th>
+          <th style="text-align: center;">الخدمات المرتبطة</th>
           <th style="width: 150px; text-align: center;">العمليات</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let cat of categories; let i = index">
-          <td>{{ cat.id }}</td>
-          <td class="font-bold text-white">{{ cat.name }}</td>
-          <td class="text-desc text-truncate">{{ cat.description || 'لا يوجد وصف' }}</td>
+          <td class="font-mono text-slate-400">#{{ cat.id }}</td>
+          <td>
+            <div class="font-bold text-white text-base">{{ cat.name }}</div>
+          </td>
+          <td class="text-desc text-truncate">{{ cat.description || 'لا يوجد وصف مضاف' }}</td>
+          <td style="text-align: center;">
+            <span class="badge" [class.badge-active]="getServicesCount(cat.id) > 0">
+              <i class="bi bi-briefcase"></i> {{ getServicesCount(cat.id) }} خدمات
+            </span>
+          </td>
           <td>
             <div class="action-buttons">
-              <button (click)="openEditForm(cat)" class="btn-action edit" title="تعديل">
+              <button (click)="openEditForm(cat)" class="btn-action edit" title="تعديل التصنيف">
                 <i class="bi bi-pencil-square"></i>
               </button>
-              <button (click)="deleteCategory(cat.id)" class="btn-action delete" title="حذف">
+              <button (click)="deleteCategory(cat.id)" class="btn-action delete" title="حذف التصنيف">
                 <i class="bi bi-trash-fill"></i>
               </button>
             </div>
           </td>
         </tr>
         <tr *ngIf="categories.length === 0">
-          <td colspan="4" class="empty-row">لا توجد تصنيفات حالياً. قم بإضافة تصنيف جديد.</td>
+          <td colspan="5" class="empty-row">لا توجد تصنيفات حالياً. قم بإضافة تصنيف جديد.</td>
         </tr>
       </tbody>
     </table>
@@ -68,19 +76,19 @@
         <div class="modal-body">
           <div class="form-group">
             <label for="catName">اسم التصنيف *</label>
-            <input type="text" id="catName" [(ngModel)]="name" name="name" required placeholder="مثال: تسويق رقمي" />
+            <input type="text" id="catName" [(ngModel)]="name" name="name" required placeholder="مثال: المنصات وتطبيقات الويب" />
           </div>
 
           <div class="form-group">
-            <label for="catDesc">الوصف</label>
-            <textarea id="catDesc" [(ngModel)]="description" name="description" rows="4" placeholder="اكتب وصفاً مختصراً للتصنيف..."></textarea>
+            <label for="catDesc">الوصف والتعريف</label>
+            <textarea id="catDesc" [(ngModel)]="description" name="description" rows="4" placeholder="اكتب وصفاً مختصراً يوضح الخدمات التي تندرج تحت هذا القسم..."></textarea>
           </div>
         </div>
 
         <div class="modal-footer">
           <button type="button" (click)="closeForm()" class="btn-secondary">إلغاء</button>
           <button type="submit" [disabled]="isSaving" class="btn-primary">
-            <span *ngIf="!isSaving">حفظ</span>
+            <span *ngIf="!isSaving"><i class="bi bi-save"></i> حفظ التصنيف</span>
             <span *ngIf="isSaving" class="btn-spinner"></span>
           </button>
         </div>

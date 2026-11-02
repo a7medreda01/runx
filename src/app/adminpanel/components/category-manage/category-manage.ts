@@ -2,7 +2,8 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ServiceCategoryService } from '../../../Services/service-category.service';
-import { ServiceCategory, ServiceCategoryRequest } from '../../../Models/api.models';
+import { ServiceService } from '../../../Services/service.service';
+import { ServiceCategory, ServiceCategoryRequest, Service } from '../../../Models/api.models';
 
 @Component({
   selector: 'app-category-manage',
@@ -13,6 +14,7 @@ import { ServiceCategory, ServiceCategoryRequest } from '../../../Models/api.mod
 })
 export class CategoryManageComponent implements OnInit {
   categories: ServiceCategory[] = [];
+  services: Service[] = [];
   isLoading = false;
   successMessage = '';
   errorMessage = '';
@@ -29,11 +31,13 @@ export class CategoryManageComponent implements OnInit {
 
   constructor(
     private categorySvc: ServiceCategoryService,
+    private serviceSvc: ServiceService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.loadCategories();
+    this.loadServices();
   }
 
   loadCategories(): void {
@@ -58,11 +62,27 @@ export class CategoryManageComponent implements OnInit {
     });
   }
 
+  loadServices(): void {
+    this.serviceSvc.getAll({ PageSize: 200 }).subscribe({
+      next: (res) => {
+        if (res.succeeded) {
+          this.services = res.data.items;
+        }
+        this.cdr.markForCheck();
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  getServicesCount(categoryId: number): number {
+    return this.services.filter(s => s.serviceCategoryId === categoryId).length;
+  }
+
   openAddForm(): void {
     this.editingId = null;
     this.name = '';
     this.description = '';
-    this.formTitle = 'إضافة تصنيف جديد';
+    this.formTitle = 'إضافة تصنيف خدمات جديد';
     this.isFormOpen = true;
     this.successMessage = '';
     this.errorMessage = '';
@@ -73,7 +93,7 @@ export class CategoryManageComponent implements OnInit {
     this.editingId = cat.id;
     this.name = cat.name;
     this.description = cat.description || '';
-    this.formTitle = 'تعديل التصنيف';
+    this.formTitle = 'تعديل التصنيف: ' + cat.name;
     this.isFormOpen = true;
     this.successMessage = '';
     this.errorMessage = '';
@@ -86,7 +106,7 @@ export class CategoryManageComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (!this.name || this.isSaving) return;
+    if (!this.name.trim() || this.isSaving) return;
 
     this.isSaving = true;
     this.successMessage = '';
@@ -95,8 +115,8 @@ export class CategoryManageComponent implements OnInit {
 
     const body: ServiceCategoryRequest = {
       id: this.editingId || 0,
-      name: this.name,
-      description: this.description
+      name: this.name.trim(),
+      description: this.description.trim()
     };
 
     if (this.editingId) {
@@ -125,7 +145,7 @@ export class CategoryManageComponent implements OnInit {
       this.categorySvc.create(body).subscribe({
         next: (res) => {
           if (res.succeeded) {
-            this.successMessage = 'تمت إضافة التصنيف بنجاح!';
+            this.successMessage = 'تمت إضافة التصنيف الجديد بنجاح!';
             this.loadCategories();
             this.closeForm();
           } else {
@@ -145,7 +165,12 @@ export class CategoryManageComponent implements OnInit {
   }
 
   deleteCategory(id: number): void {
-    if (!confirm('هل أنت متأكد من حذف هذا التصنيف؟ قد يؤثر ذلك على الخدمات والمشاريع المرتبطة به.')) {
+    const count = this.getServicesCount(id);
+    const warnMsg = count > 0 
+      ? `تحذير: هذا التصنيف يحتوي على (${count}) خدمة مرتبطة به! هل أنت متأكد من الحذف؟` 
+      : 'هل أنت متأكد من حذف هذا التصنيف؟';
+
+    if (!confirm(warnMsg)) {
       return;
     }
 

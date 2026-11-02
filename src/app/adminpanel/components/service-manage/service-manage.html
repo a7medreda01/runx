@@ -1,8 +1,8 @@
 <div class="manage-container animate-fade-in">
   <div class="header-section flex-header">
     <div>
-      <h3>خدمات الشركة</h3>
-      <p>إدارة الخدمات المعروضة على الموقع وربطها بالتصنيفات</p>
+      <h3>خدمات الشركة والحلول البرمجية</h3>
+      <p>إدارة وتعديل كافة تفاصيل الخدمات: العناوين، التصنيفات، الأسعار، الأيقونات، الميزات، والتقنيات</p>
     </div>
     <button (click)="openAddForm()" class="btn-primary-sm">
       <i class="bi bi-plus-lg"></i> إضافة خدمة جديدة
@@ -27,36 +27,53 @@
     <table class="admin-table">
       <thead>
         <tr>
-          <th style="width: 80px;">الصورة</th>
-          <th>اسم الخدمة</th>
+          <th style="width: 70px;">الأيقونة</th>
+          <th>اسم الخدمة والتخصص</th>
           <th>التصنيف</th>
-          <th>الوصف</th>
+          <th>السعر يبدأ من</th>
+          <th>الميزات</th>
           <th style="width: 150px; text-align: center;">العمليات</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let svc of services">
           <td>
-            <div class="table-img-wrapper">
-              <img [src]="svc.imageUrl || 'assets/placeholder-service.png'" alt="Service Image" class="table-thumb" />
+            <div class="table-icon-wrapper">
+              <i class="bi" [ngClass]="svc.bootstrapIcon || 'bi-code-slash'"></i>
             </div>
           </td>
-          <td class="font-bold text-white">{{ svc.name }}</td>
-          <td><span class="badge">{{ svc.categoryName || 'بدون تصنيف' }}</span></td>
-          <td class="text-desc text-truncate">{{ svc.description || 'لا يوجد وصف' }}</td>
+          <td>
+            <div class="font-bold text-white text-base">{{ svc.name }}</div>
+            <div *ngIf="svc.subtitle" class="text-xs text-slate-400 mt-0.5">{{ svc.subtitle }}</div>
+          </td>
+          <td>
+            <span class="badge category-badge">{{ svc.categoryName || 'بدون تصنيف' }}</span>
+          </td>
+          <td>
+            <span class="price-badge" *ngIf="svc.priceStart">
+              يبدأ من {{ svc.priceStart }} $
+            </span>
+            <span class="text-slate-500 text-xs" *ngIf="!svc.priceStart">حسب النطاق</span>
+          </td>
+          <td>
+            <span class="feature-count-badge">
+              <i class="bi bi-check2-circle"></i>
+              {{ parseFeaturesCount(svc.featuresJson) }} ميزات
+            </span>
+          </td>
           <td>
             <div class="action-buttons">
-              <button (click)="openEditForm(svc)" class="btn-action edit" title="تعديل">
+              <button (click)="openEditForm(svc)" class="btn-action edit" title="تعديل كافة بيانات الخدمة">
                 <i class="bi bi-pencil-square"></i>
               </button>
-              <button (click)="deleteService(svc.id)" class="btn-action delete" title="حذف">
+              <button (click)="deleteService(svc.id)" class="btn-action delete" title="حذف الخدمة">
                 <i class="bi bi-trash-fill"></i>
               </button>
             </div>
           </td>
         </tr>
         <tr *ngIf="services.length === 0">
-          <td colspan="5" class="empty-row">لا توجد خدمات حالياً. قم بإضافة خدمة جديدة.</td>
+          <td colspan="6" class="empty-row">لا توجد خدمات حالياً. قم بالنقر على "إضافة خدمة جديدة".</td>
         </tr>
       </tbody>
     </table>
@@ -64,7 +81,7 @@
 
   <!-- Modal Form Backdrop -->
   <div *ngIf="isFormOpen" class="modal-backdrop animate-fade-in">
-    <div class="modal-card">
+    <div class="modal-card wide-modal">
       <div class="modal-header">
         <h4>{{ formTitle }}</h4>
         <button (click)="closeForm()" class="btn-close"><i class="bi bi-x-lg"></i></button>
@@ -72,27 +89,127 @@
 
       <form (ngSubmit)="onSubmit()">
         <div class="modal-body scrollable-body">
-          <div class="form-group">
-            <label for="svcName">اسم الخدمة *</label>
-            <input type="text" id="svcName" [(ngModel)]="name" name="name" required placeholder="مثال: إدارة حملات إعلانية" />
+          
+          <!-- Basic Info: Name & Subtitle -->
+          <div class="two-col-grid">
+            <div class="form-group">
+              <label for="svcName">اسم الخدمة الرئيسي *</label>
+              <input type="text" id="svcName" [(ngModel)]="name" name="name" required placeholder="مثال: تطوير وتصميم المنصات السحابية" />
+            </div>
+
+            <div class="form-group">
+              <label for="svcSubtitle">العنوان الفرعي / التخصصي</label>
+              <input type="text" id="svcSubtitle" [(ngModel)]="subtitle" name="subtitle" placeholder="مثال: SaaS Platforms & Cloud Systems" />
+            </div>
           </div>
 
-          <div class="form-group">
-            <label for="svcCategory">التصنيف *</label>
-            <select id="svcCategory" [(ngModel)]="categoryId" name="categoryId" required>
-              <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
-              <option *ngIf="categories.length === 0" disabled>الرجاء إنشاء تصنيف أولاً</option>
-            </select>
+          <!-- Category & Price -->
+          <div class="two-col-grid">
+            <div class="form-group">
+              <label for="svcCategory">تصنيف الخدمة *</label>
+              <select id="svcCategory" [(ngModel)]="categoryId" name="categoryId" required>
+                <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+                <option *ngIf="categories.length === 0" disabled>الرجاء إنشاء تصنيف أولاً</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="svcPrice">السعر المبدئي ($ دولار)</label>
+              <input type="number" id="svcPrice" [(ngModel)]="priceStart" name="priceStart" placeholder="مثال: 1200 (اتركه فارغاً إذا كان حسب النطاق)" />
+            </div>
           </div>
 
+          <!-- Icon Selector -->
           <div class="form-group">
-            <label for="svcDesc">الوصف *</label>
-            <textarea id="svcDesc" [(ngModel)]="description" name="description" rows="4" required placeholder="اكتب تفاصيل ووصف الخدمة..."></textarea>
+            <label>أيقونة الخدمة (اختر من القائمة أو أدخل كلاس Bootstrap Icon)</label>
+            <div class="icon-picker-grid">
+              <button 
+                type="button" 
+                *ngFor="let iconOpt of availableIcons" 
+                (click)="selectIcon(iconOpt.id)" 
+                class="icon-picker-item" 
+                [class.selected]="bootstrapIcon === iconOpt.id"
+              >
+                <i class="bi" [ngClass]="iconOpt.id"></i>
+                <span>{{ iconOpt.label }}</span>
+              </button>
+            </div>
+            <div class="custom-icon-row mt-2">
+              <span class="text-xs text-slate-400">أو كلاس الأيقونة يدوياً:</span>
+              <input type="text" [(ngModel)]="bootstrapIcon" name="customIcon" placeholder="bi-code-slash" class="input-inline" />
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label for="svcDesc">الوصف التعريفي للخدمة *</label>
+            <textarea id="svcDesc" [(ngModel)]="description" name="description" rows="4" required placeholder="اشرح القيمة التي تقدمها الخدمة للعميل والحلول المتضمنة..."></textarea>
+          </div>
+
+          <!-- Features Dynamic Section -->
+          <div class="features-section">
+            <div class="section-title-row">
+              <div>
+                <h5>مخرجات وميزات الخدمة الرئيسية</h5>
+                <span class="text-xs text-slate-400">قائمة النقاط والمزايا التي تظهر للعميل في بطاقة وتفاصيل الخدمة</span>
+              </div>
+              <button type="button" (click)="addFeatureInput()" class="btn-secondary-sm">
+                <i class="bi bi-plus-lg"></i> إضافة ميزة
+              </button>
+            </div>
+            
+            <div class="features-inputs-list">
+              <div *ngFor="let feat of featuresList; let idx = index; trackBy: trackByIndex" class="feature-input-row animate-fade-in">
+                <span class="bullet-number">{{ idx + 1 }}</span>
+                <input 
+                  type="text" 
+                  [(ngModel)]="featuresList[idx]" 
+                  name="feature_{{idx}}" 
+                  placeholder="مثال: بنية سحابية عالية التوفر قابلة للتوسع بدون توقف" 
+                  required
+                />
+                <button type="button" (click)="removeFeatureInput(idx)" class="btn-delete-row" title="إزالة الميزة">
+                  <i class="bi bi-dash-circle-fill"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Technologies Tags Section -->
+          <div class="tech-section">
+            <label>التقنيات والأدوات المستخدمة في الخدمة</label>
+            <div class="tech-tags-container">
+              <span *ngFor="let tech of technologiesList; let i = index" class="tech-tag">
+                {{ tech }}
+                <button type="button" (click)="removeTechnology(i)">&times;</button>
+              </span>
+              <div class="tech-input-group">
+                <input 
+                  type="text" 
+                  [(ngModel)]="newTechInput" 
+                  name="newTech" 
+                  (keydown.enter)="$event.preventDefault(); addTechnology()" 
+                  placeholder="اكتب تقنية واضغط Enter..."
+                />
+                <button type="button" (click)="addTechnology()" class="btn-add-tech">إضافة</button>
+              </div>
+            </div>
+            <div class="tech-suggestions">
+              <span class="text-xs text-slate-400">مقترحات شائعة:</span>
+              <button 
+                type="button" 
+                *ngFor="let sug of suggestedTechnologies" 
+                (click)="addTechnology(sug)" 
+                class="btn-suggestion"
+              >
+                + {{ sug }}
+              </button>
+            </div>
           </div>
 
           <!-- Image Picker -->
           <div class="form-group">
-            <label>صورة الخدمة</label>
+            <label>صورة الخدمة / الغلاف الإيضاحي</label>
             <div class="image-uploader">
               <div *ngIf="imagePreview" class="preview-box">
                 <img [src]="imagePreview" alt="Preview" class="preview-img" />
@@ -104,12 +221,13 @@
               <span *ngIf="selectedImage" class="file-chosen-text">{{ selectedImage.name }}</span>
             </div>
           </div>
+
         </div>
 
         <div class="modal-footer">
           <button type="button" (click)="closeForm()" class="btn-secondary">إلغاء</button>
           <button type="submit" [disabled]="isSaving || categories.length === 0" class="btn-primary">
-            <span *ngIf="!isSaving">حفظ</span>
+            <span *ngIf="!isSaving"><i class="bi bi-save"></i> حفظ كافة التغييرات</span>
             <span *ngIf="isSaving" class="btn-spinner"></span>
           </button>
         </div>

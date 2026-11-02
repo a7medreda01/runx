@@ -2,7 +2,7 @@
   <div class="header-section flex-header">
     <div>
       <h3>باقات العروض والأسعار</h3>
-      <p>إدارة باقات الخدمات والأسعار والميزات المرفقة بكل باقة</p>
+      <p>إدارة وتعديل باقات الخدمات والأسعار، والميزات التنافسية المتضمنة في كل باقة</p>
     </div>
     <button (click)="openAddForm()" class="btn-primary-sm">
       <i class="bi bi-plus-lg"></i> إضافة باقة جديدة
@@ -19,7 +19,7 @@
 
   <div *ngIf="isLoading" class="loading-state">
     <div class="spinner"></div>
-    <span>جاري تحميل الباقات...</span>
+    <span>جاري تحميل باقات الأسعار...</span>
   </div>
 
   <!-- Table List -->
@@ -31,7 +31,7 @@
           <th>اسم الباقة</th>
           <th>السعر</th>
           <th>الوصف</th>
-          <th style="text-align: center;">الميزات</th>
+          <th>الميزات المرفقة</th>
           <th style="width: 150px; text-align: center;">العمليات</th>
         </tr>
       </thead>
@@ -42,20 +42,31 @@
               <img [src]="pkg.imageUrl || 'assets/placeholder-package.png'" alt="Package Image" class="table-thumb" />
             </div>
           </td>
-          <td class="font-bold text-white">{{ pkg.name }}</td>
-          <td><span class="price-badge">{{ pkg.price }} $</span></td>
-          <td class="text-desc text-truncate">{{ pkg.description || 'لا يوجد وصف' }}</td>
-          <td style="text-align: center;">
-            <span class="feature-count-badge">
-              {{ pkg.features?.length || 0 }} ميزات
-            </span>
+          <td>
+            <div class="font-bold text-white text-base">{{ pkg.name }}</div>
+          </td>
+          <td>
+            <span class="price-badge">{{ pkg.price }} $</span>
+          </td>
+          <td class="text-desc text-truncate" style="max-width: 200px;">
+            {{ pkg.description || 'لا يوجد وصف' }}
+          </td>
+          <td>
+            <div class="flex flex-wrap gap-1 max-w-xs">
+              <span *ngFor="let feat of pkg.features" class="feature-tag">
+                <i class="bi bi-check2"></i> {{ feat.title }}
+              </span>
+              <span *ngIf="!pkg.features || pkg.features.length === 0" class="text-slate-500 text-xs">
+                لا توجد ميزات مضافة
+              </span>
+            </div>
           </td>
           <td>
             <div class="action-buttons">
-              <button (click)="openEditForm(pkg)" class="btn-action edit" title="تعديل">
+              <button (click)="openEditForm(pkg)" class="btn-action edit" title="تعديل الباقة">
                 <i class="bi bi-pencil-square"></i>
               </button>
-              <button (click)="deletePackage(pkg.id)" class="btn-action delete" title="حذف">
+              <button (click)="deletePackage(pkg.id)" class="btn-action delete" title="حذف الباقة">
                 <i class="bi bi-trash-fill"></i>
               </button>
             </div>
@@ -81,23 +92,23 @@
           <div class="two-col-grid">
             <div class="form-group">
               <label for="pkgName">اسم الباقة *</label>
-              <input type="text" id="pkgName" [(ngModel)]="name" name="name" required placeholder="مثال: الباقة الأساسية" />
+              <input type="text" id="pkgName" [(ngModel)]="name" name="name" required placeholder="مثال: الباقة الاحترافية المتكاملة" />
             </div>
 
             <div class="form-group">
-              <label for="pkgPrice">السعر *</label>
-              <input type="number" id="pkgPrice" [(ngModel)]="price" name="price" required placeholder="مثال: 1500" />
+              <label for="pkgPrice">سعر الباقة ($ دولار) *</label>
+              <input type="number" id="pkgPrice" [(ngModel)]="price" name="price" required placeholder="مثال: 2500" />
             </div>
           </div>
 
           <div class="two-col-grid">
             <div class="form-group">
-              <label for="pkgDesc">الوصف</label>
-              <textarea id="pkgDesc" [(ngModel)]="description" name="description" rows="3" placeholder="اكتب وصفاً أو نبذة عن الباقة..."></textarea>
+              <label for="pkgDesc">الوصف التعريفي للباقة</label>
+              <textarea id="pkgDesc" [(ngModel)]="description" name="description" rows="3" placeholder="اكتب وصفاً أو الجمهور المستهدف من هذه الباقة..."></textarea>
             </div>
 
             <div class="form-group">
-              <label>صورة الباقة</label>
+              <label>صورة أو أيقونة الباقة</label>
               <div class="image-uploader">
                 <div *ngIf="imagePreview" class="preview-box">
                   <img [src]="imagePreview" alt="Preview" class="preview-img" />
@@ -114,7 +125,10 @@
           <!-- Dynamic Features Section -->
           <div class="features-section">
             <div class="section-title-row">
-              <h5>ميزات الباقة</h5>
+              <div>
+                <h5>ميزات وخصائص الباقة</h5>
+                <span class="text-xs text-slate-400">أضف الميزات التفصيلية التي يحصل عليها العميل عند اختياره هذه الباقة</span>
+              </div>
               <button type="button" (click)="addFeatureInput()" class="btn-secondary-sm">
                 <i class="bi bi-plus-lg"></i> إضافة ميزة
               </button>
@@ -122,14 +136,15 @@
             
             <div class="features-inputs-list">
               <div *ngFor="let feat of featuresList; let idx = index; trackBy: trackByIndex" class="feature-input-row animate-fade-in">
+                <span class="bullet-number">{{ idx + 1 }}</span>
                 <input 
                   type="text" 
                   [(ngModel)]="featuresList[idx]" 
                   name="feature_{{idx}}" 
-                  placeholder="مثال: استضافة مجانية لمدة سنة" 
+                  placeholder="مثال: تصميم مخصص متكامل + لوحة تحكم إدارية" 
                   required
                 />
-                <button type="button" (click)="removeFeatureInput(idx)" class="btn-delete-row" title="إزالة">
+                <button type="button" (click)="removeFeatureInput(idx)" class="btn-delete-row" title="إزالة الميزة">
                   <i class="bi bi-dash-circle-fill"></i>
                 </button>
               </div>
@@ -140,7 +155,7 @@
         <div class="modal-footer">
           <button type="button" (click)="closeForm()" class="btn-secondary">إلغاء</button>
           <button type="submit" [disabled]="isSaving" class="btn-primary">
-            <span *ngIf="!isSaving">حفظ الباقة</span>
+            <span *ngIf="!isSaving"><i class="bi bi-save"></i> حفظ الباقة بكافة ميزاتها</span>
             <span *ngIf="isSaving" class="btn-spinner"></span>
           </button>
         </div>

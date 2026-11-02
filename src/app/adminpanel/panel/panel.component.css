@@ -1,6 +1,7 @@
 .panel-layout {
   display: flex;
-  flex-direction: row-reverse; /* Sidebar on the right, content on the left for Arabic RTL */
+  flex-direction: row; /* In RTL: Sidebar is on the right, content is on the left */
+  direction: rtl;
   min-height: 100vh;
   background-color: #0d0e15;
   font-family: 'Tajawal', 'Inter', sans-serif;
