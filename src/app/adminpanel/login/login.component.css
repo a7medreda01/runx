@@ -127,6 +127,37 @@
   box-sizing: border-box;
 }
 
+.password-container input {
+  padding: 14px 45px 14px 45px;
+}
+
+.btn-toggle-eye {
+  position: absolute;
+  left: 14px;
+  background: transparent;
+  border: none;
+  color: #a0aec0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  font-size: 1.15rem;
+  transition: color 0.2s ease;
+  z-index: 3;
+}
+
+.btn-toggle-eye:hover {
+  color: #fff;
+}
+
+.btn-toggle-eye i {
+  position: static;
+  pointer-events: auto;
+  color: inherit;
+  font-size: inherit;
+}
+
 .input-container input:focus {
   outline: none;
   background: rgba(255, 255, 255, 0.08);

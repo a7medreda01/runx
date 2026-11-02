@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -14,33 +14,47 @@ import { AdminAuthService } from '../admin-auth.service';
 export class AdminLoginComponent {
   email = '';
   password = '';
-  errorMessage = '';
-  isLoading = false;
+  showPassword = signal(false);
+  errorMessage = signal('');
+  isLoading = signal(false);
 
   constructor(
     private authService: AdminAuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
-  onSubmit(): void {
-    if (!this.email || !this.password) {
-      this.errorMessage = 'الرجاء إدخال البريد الإلكتروني وكلمة المرور';
+  togglePassword(): void {
+    this.showPassword.update(v => !v);
+  }
+
+  async onSubmit(): Promise<void> {
+    const cleanEmail = (this.email || '').trim();
+    const cleanPass = (this.password || '').trim();
+
+    if (!cleanEmail || !cleanPass) {
+      this.errorMessage.set('الرجاء إدخال البريد الإلكتروني وكلمة المرور');
+      this.cdr.markForCheck();
       return;
     }
 
-    this.isLoading = true;
-    this.errorMessage = '';
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+    this.cdr.markForCheck();
 
-    // Artificial delay to simulate processing and look professional
-    setTimeout(() => {
-      const success = this.authService.login(this.email, this.password);
-      this.isLoading = false;
-
+    try {
+      const success = this.authService.login(cleanEmail, cleanPass);
       if (success) {
-        this.router.navigate(['/admin']);
+        await this.router.navigate(['/admin']);
       } else {
-        this.errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+        this.errorMessage.set('البريد الإلكتروني أو كلمة المرور غير صحيحة');
       }
-    }, 800);
+    } catch (err) {
+      console.error('Login error:', err);
+      this.errorMessage.set('حدث خطأ أثناء تسجيل الدخول');
+    } finally {
+      this.isLoading.set(false);
+      this.cdr.markForCheck();
+    }
   }
 }

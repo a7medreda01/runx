@@ -22,36 +22,52 @@
             name="email" 
             [(ngModel)]="email" 
             required 
-            placeholder="admin@example.com"
+            placeholder="def@admin.com"
             dir="ltr"
+            autocomplete="email"
           />
         </div>
       </div>
 
       <div class="form-group">
         <label for="password">كلمة المرور</label>
-        <div class="input-container">
-          <i class="bi bi-lock"></i>
+        <div class="input-container password-container">
+          <i class="bi bi-lock leading-icon"></i>
           <input 
-            type="password" 
+            [type]="showPassword() ? 'text' : 'password'" 
             id="password" 
             name="password" 
             [(ngModel)]="password" 
             required 
             placeholder="••••••••"
             dir="ltr"
+            autocomplete="current-password"
           />
+          <button 
+            type="button" 
+            class="btn-toggle-eye" 
+            (click)="togglePassword()" 
+            tabindex="-1"
+            [title]="showPassword() ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'"
+          >
+            <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
+          </button>
         </div>
       </div>
 
-      <div *ngIf="errorMessage" class="error-banner animate-fade-in">
-        <i class="bi bi-exclamation-triangle-fill"></i>
-        <span>{{ errorMessage }}</span>
-      </div>
+      @if (errorMessage()) {
+        <div class="error-banner animate-fade-in">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
 
-      <button type="submit" [disabled]="isLoading" class="btn-submit">
-        <span *ngIf="!isLoading">دخول</span>
-        <span *ngIf="isLoading" class="loader"></span>
+      <button type="submit" [disabled]="isLoading()" class="btn-submit">
+        @if (!isLoading()) {
+          <span>دخول</span>
+        } @else {
+          <span class="loader"></span>
+        }
       </button>
     </form>
     

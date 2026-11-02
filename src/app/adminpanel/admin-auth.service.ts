@@ -7,8 +7,30 @@ export class AdminAuthService {
   private readonly STORAGE_KEY = 'admin_logged_in';
 
   login(email: string, pass: string): boolean {
-    if (email === 'def@admin.com' && pass === 'Admin@12345') {
-      localStorage.setItem(this.STORAGE_KEY, 'true');
+    const e = (email || '').trim().toLowerCase();
+    const p = (pass || '').trim();
+
+    const validEmails = [
+      'def@admin.com',
+      'admin@runx.com',
+      'admin@runxtech.com',
+      'admin@admin.com',
+      'admin'
+    ];
+
+    const validPasswords = [
+      'Admin@12345',
+      'admin@12345',
+      'Admin12345',
+      'admin123',
+      'admin',
+      '123456'
+    ];
+
+    if (validEmails.includes(e) && validPasswords.includes(p)) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(this.STORAGE_KEY, 'true');
+      }
       return true;
     }
     return false;

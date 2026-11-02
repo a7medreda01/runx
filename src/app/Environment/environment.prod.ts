@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'http://localhost:5244/api'
+  apiBaseUrl: 'https://runxtech.runasp.net/api'
 };

@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AdminAuthService } from '../admin-auth.service';
@@ -59,7 +59,8 @@ export class AdminPanelComponent implements OnInit {
     private serviceSvc: ServiceService,
     private packageSvc: PackageService,
     private categorySvc: ServiceCategoryService,
-    private companySvc: CompanyService
+    private companySvc: CompanyService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -68,35 +69,60 @@ export class AdminPanelComponent implements OnInit {
 
   loadStats(): void {
     this.isLoadingStats = true;
+    this.cdr.markForCheck();
     
     // Count Projects
-    this.projectSvc.getAll({ PageSize: 1 }).subscribe(res => {
-      if (res.succeeded) this.stats.projectsCount = res.data.totalCount;
+    this.projectSvc.getAll({ PageSize: 1 }).subscribe({
+      next: res => {
+        if (res.succeeded) this.stats.projectsCount = res.data.totalCount;
+        this.cdr.markForCheck();
+      },
+      error: () => this.cdr.markForCheck()
     });
 
     // Count Services
-    this.serviceSvc.getAll({ PageSize: 1 }).subscribe(res => {
-      if (res.succeeded) this.stats.servicesCount = res.data.totalCount;
+    this.serviceSvc.getAll({ PageSize: 1 }).subscribe({
+      next: res => {
+        if (res.succeeded) this.stats.servicesCount = res.data.totalCount;
+        this.cdr.markForCheck();
+      },
+      error: () => this.cdr.markForCheck()
     });
 
     // Count Packages
-    this.packageSvc.getAll({ PageSize: 1 }).subscribe(res => {
-      if (res.succeeded) this.stats.packagesCount = res.data.totalCount;
+    this.packageSvc.getAll({ PageSize: 1 }).subscribe({
+      next: res => {
+        if (res.succeeded) this.stats.packagesCount = res.data.totalCount;
+        this.cdr.markForCheck();
+      },
+      error: () => this.cdr.markForCheck()
     });
 
     // Count Categories
-    this.categorySvc.getAll({ PageSize: 1 }).subscribe(res => {
-      if (res.succeeded) this.stats.categoriesCount = res.data.totalCount;
+    this.categorySvc.getAll({ PageSize: 1 }).subscribe({
+      next: res => {
+        if (res.succeeded) this.stats.categoriesCount = res.data.totalCount;
+        this.cdr.markForCheck();
+      },
+      error: () => this.cdr.markForCheck()
     });
 
     // Company Name
-    this.companySvc.getAll().subscribe(res => {
-      if (res.succeeded && res.data && res.data.length > 0) {
-        this.stats.companyName = res.data[0].name;
-      } else {
-        this.stats.companyName = 'لم يتم تحديد الاسم';
+    this.companySvc.getAll().subscribe({
+      next: res => {
+        if (res.succeeded && res.data && res.data.length > 0) {
+          this.stats.companyName = res.data[0].name;
+        } else {
+          this.stats.companyName = 'RunX Tech';
+        }
+        this.isLoadingStats = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.stats.companyName = 'RunX Tech';
+        this.isLoadingStats = false;
+        this.cdr.markForCheck();
       }
-      this.isLoadingStats = false;
     });
   }
 
