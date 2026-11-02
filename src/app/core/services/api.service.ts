@@ -1,4 +1,4 @@
-﻿import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { HttpHeaders } from '@angular/common/http';
@@ -290,6 +290,16 @@ export class ApiService {
           const rawImg = s.imageUrl;
           const imgUrl = this.normalizeUrl(rawImg);
 
+          let priceUsd: number | undefined = undefined;
+          let priceEgp: number | undefined = undefined;
+          if (s.priceStart !== null && s.priceStart !== undefined && s.priceStart !== '') {
+            const parsed = parseFloat(s.priceStart.toString().replace(/[^0-9.]/g, ''));
+            if (!isNaN(parsed) && parsed > 0) {
+              priceUsd = parsed;
+              priceEgp = Math.round(parsed * 50);
+            }
+          }
+
           return {
             id: s.id ? s.id.toString() : 'srv-' + Math.random(),
             title: s.name,
@@ -300,7 +310,9 @@ export class ApiService {
             description: s.description || '',
             features: features,
             technologies: technologies,
-            priceStart: (s.priceStart !== null && s.priceStart !== undefined && s.priceStart !== '') ? (s.priceStart.toString().includes('يبدأ من') ? s.priceStart.toString() : 'يبدأ من ' + s.priceStart + ' $') : 'حسب النطاق'
+            priceStart: (s.priceStart !== null && s.priceStart !== undefined && s.priceStart !== '') ? (s.priceStart.toString().includes('يبدأ من') ? s.priceStart.toString() : 'يبدأ من ' + s.priceStart + ' $') : 'حسب النطاق',
+            priceUsd: priceUsd,
+            priceEgp: priceEgp
           };
         });
 

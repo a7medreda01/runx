@@ -1,6 +1,7 @@
-﻿import { Injectable, signal, computed, inject, effect } from '@angular/core';
+import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LanguageService } from './language.service';
+import { CurrencyService, CurrencyType } from './currency.service';
 import { environment } from '../../Environment/environment';
 import { catchError, map, of } from 'rxjs';
 
@@ -31,7 +32,7 @@ export interface TimelineOption {
   description: string;
 }
 
-export type CurrencyType = 'EGP' | 'USD';
+export type { CurrencyType };
 
 @Injectable({
   providedIn: 'root'
@@ -39,8 +40,10 @@ export type CurrencyType = 'EGP' | 'USD';
 export class EstimatorService {
   private http = inject(HttpClient);
   private languageService = inject(LanguageService);
+  public currencyService = inject(CurrencyService);
 
-  public selectedCurrency = signal<CurrencyType>('EGP');
+  public selectedCurrency = this.currencyService.selectedCurrency;
+  public currencySymbol = this.currencyService.currencySymbol;
 
   public projectTypes = signal<ProjectTypeOption[]>([
     {
@@ -160,7 +163,6 @@ export class EstimatorService {
   public isLoadingOptions = signal<boolean>(false);
 
   constructor() {
-    this.detectUserCountryCurrency();
     effect(() => {
       // Re-fetch calculator options whenever language changes
       const lang = this.languageService.currentLang();
@@ -168,22 +170,8 @@ export class EstimatorService {
     });
   }
 
-  private detectUserCountryCurrency(): void {
-    try {
-      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-      const userLang = navigator.language || '';
-      if (timeZone.includes('Cairo') || timeZone.includes('Egypt') || userLang.toLowerCase().includes('ar-eg')) {
-        this.selectedCurrency.set('EGP');
-      } else {
-        this.selectedCurrency.set('USD');
-      }
-    } catch {
-      this.selectedCurrency.set('USD');
-    }
-  }
-
   public setCurrency(currency: CurrencyType): void {
-    this.selectedCurrency.set(currency);
+    this.currencyService.setCurrency(currency);
   }
 
   public fetchOptionsFromApi(): void {
@@ -243,10 +231,6 @@ export class EstimatorService {
     }, 0);
     const multiplier = this.currentTimeline()?.multiplier || 1.0;
     return Math.round((base + addonsSum) * multiplier);
-  });
-
-  public currencySymbol = computed(() => {
-    return this.selectedCurrency() === 'EGP' ? 'ج.م' : '$';
   });
 
   public estimatedTotalDays = computed(() => {

@@ -1,4 +1,4 @@
-﻿import { ServiceItem } from '../../models/project.model';
+import { ServiceItem } from '../../models/project.model';
 
 export const INITIAL_SERVICES: ServiceItem[] = [
   {
@@ -15,7 +15,9 @@ export const INITIAL_SERVICES: ServiceItem[] = [
       'أداء سريع بمعمارية متطورة تضمن استقرار 99.9%'
     ],
     technologies: ['Angular', 'TypeScript', 'ASP.NET Core', 'Node.js', 'PostgreSQL', 'Docker'],
-    priceStart: 'يبدأ من 1,500 $'
+    priceStart: 'يبدأ من 1,500 $',
+    priceUsd: 1500,
+    priceEgp: 75000
   },
   {
     id: 'srv-2',
@@ -31,7 +33,9 @@ export const INITIAL_SERVICES: ServiceItem[] = [
       'دعم الدفع الإلكتروني الداخلي وبصمة الوجه والإصبع'
     ],
     technologies: ['Flutter', 'Dart', 'Swift', 'Kotlin', 'Firebase', 'REST APIs'],
-    priceStart: 'يبدأ من 2,000 $'
+    priceStart: 'يبدأ من 2,000 $',
+    priceUsd: 2000,
+    priceEgp: 100000
   },
   {
     id: 'srv-3',
@@ -47,7 +51,9 @@ export const INITIAL_SERVICES: ServiceItem[] = [
       'إدارة مخزون متقدمة وتحديث فوري لحالات الطلبات'
     ],
     technologies: ['Angular', 'RxJS', 'Node.js', 'Stripe', 'Redis', 'WebSockets'],
-    priceStart: 'يبدأ من 1,800 $'
+    priceStart: 'يبدأ من 1,800 $',
+    priceUsd: 1800,
+    priceEgp: 90000
   },
   {
     id: 'srv-4',
@@ -63,7 +69,9 @@ export const INITIAL_SERVICES: ServiceItem[] = [
       'بناء نظام تصميم متكامل (Design System) للهوية الرقمية'
     ],
     technologies: ['Figma', 'Adobe XD', 'Prototyping', 'Design Systems', 'User Research'],
-    priceStart: 'يبدأ من 900 $'
+    priceStart: 'يبدأ من 900 $',
+    priceUsd: 900,
+    priceEgp: 45000
   },
   {
     id: 'srv-5',
@@ -79,6 +87,8 @@ export const INITIAL_SERVICES: ServiceItem[] = [
       'إعادة هيكلة الكود وقواعد البيانات لتتحمل آلاف المستعملين'
     ],
     technologies: ['Cloudflare', 'Linux', 'Nginx', 'SSL', 'CyberSecurity'],
-    priceStart: 'يبدأ من 800 $'
+    priceStart: 'يبدأ من 800 $',
+    priceUsd: 800,
+    priceEgp: 40000
   }
 ];

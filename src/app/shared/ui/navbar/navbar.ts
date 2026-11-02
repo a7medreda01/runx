@@ -2,6 +2,7 @@ import { Component, signal, HostListener, Output, EventEmitter, inject } from '@
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { LanguageService } from '../../../core/services/language.service';
+import { CurrencyService } from '../../../core/services/currency.service';
 
 @Component({
   selector: 'app-navbar',
@@ -77,9 +78,39 @@ import { LanguageService } from '../../../core/services/language.service';
             </a>
           </nav>
 
-          <!-- Action Button & Language Switcher -->
+          <!-- Action Button & Switchers -->
           <div class="hidden md:flex items-center gap-3">
             
+            <!-- Currency Switcher Pill Button -->
+            <div class="inline-flex items-center bg-slate-100 hover:bg-slate-200/80 border border-slate-300 rounded-full p-0.5 text-xs font-bold transition-all shadow-xs">
+              <button 
+                (click)="currency.setCurrency('EGP')" 
+                type="button"
+                class="px-2.5 py-1 rounded-full transition-all flex items-center gap-1 cursor-pointer"
+                [class.bg-[#1E2A4A]]="currency.selectedCurrency() === 'EGP'"
+                [class.text-white]="currency.selectedCurrency() === 'EGP'"
+                [class.shadow-xs]="currency.selectedCurrency() === 'EGP'"
+                [class.text-slate-600]="currency.selectedCurrency() !== 'EGP'"
+                title="السعر بالجنيه المصري (EGP)"
+              >
+                <span>🇪🇬</span>
+                <span>{{ lang.currentLang() === 'ar' ? 'ج.م' : 'EGP' }}</span>
+              </button>
+              <button 
+                (click)="currency.setCurrency('USD')" 
+                type="button"
+                class="px-2.5 py-1 rounded-full transition-all flex items-center gap-1 cursor-pointer"
+                [class.bg-[#1E2A4A]]="currency.selectedCurrency() === 'USD'"
+                [class.text-white]="currency.selectedCurrency() === 'USD'"
+                [class.shadow-xs]="currency.selectedCurrency() === 'USD'"
+                [class.text-slate-600]="currency.selectedCurrency() !== 'USD'"
+                title="Global USD Price ($)"
+              >
+                <span>🌐</span>
+                <span>$</span>
+              </button>
+            </div>
+
             <!-- Language Toggle Pill Button -->
             <button 
               (click)="lang.toggleLanguage()" 
@@ -103,12 +134,22 @@ import { LanguageService } from '../../../core/services/language.service';
             </button>
           </div>
 
-          <!-- Mobile Right Controls (Lang + Hamburger) -->
-          <div class="flex md:hidden items-center gap-2">
+          <!-- Mobile Right Controls (Currency + Lang + Hamburger) -->
+          <div class="flex md:hidden items-center gap-1.5">
+            <button 
+              (click)="currency.toggleCurrency()" 
+              type="button"
+              class="px-2 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs font-bold text-slate-800 flex items-center gap-1 cursor-pointer"
+              [title]="'تبديل العملة: ' + currency.currencyLabel()"
+            >
+              <span>{{ currency.selectedCurrency() === 'EGP' ? '🇪🇬' : '🌐' }}</span>
+              <span>{{ currency.currencySymbol() }}</span>
+            </button>
+
             <button 
               (click)="lang.toggleLanguage()" 
               type="button"
-              class="px-2.5 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs font-bold text-slate-800 flex items-center gap-1 cursor-pointer"
+              class="px-2 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs font-bold text-slate-800 flex items-center gap-1 cursor-pointer"
             >
               <span>{{ lang.t()['lang_flag'] }}</span>
               <span>{{ lang.t()['lang_btn_label'] }}</span>
@@ -116,7 +157,7 @@ import { LanguageService } from '../../../core/services/language.service';
 
             <button 
               (click)="toggleMobileMenu()"
-              class="p-2.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-800 hover:text-[#C1662F]"
+              class="p-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-800 hover:text-[#C1662F]"
               aria-label="Menu"
             >
               @if (!mobileMenuOpen()) {
@@ -174,6 +215,35 @@ import { LanguageService } from '../../../core/services/language.service';
               {{ lang.t()['nav_contact'] }}
             </a>
 
+            <!-- Mobile Currency Switcher Section -->
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between px-2">
+              <span class="text-xs font-bold text-slate-600">{{ lang.currentLang() === 'ar' ? 'عملة الأسعار:' : 'Currency:' }}</span>
+              <div class="inline-flex items-center bg-slate-100 border border-slate-200 rounded-full p-0.5 text-xs font-bold">
+                <button 
+                  (click)="currency.setCurrency('EGP')" 
+                  type="button"
+                  class="px-3 py-1 rounded-full transition-all flex items-center gap-1 cursor-pointer"
+                  [class.bg-[#1E2A4A]]="currency.selectedCurrency() === 'EGP'"
+                  [class.text-white]="currency.selectedCurrency() === 'EGP'"
+                  [class.text-slate-700]="currency.selectedCurrency() !== 'EGP'"
+                >
+                  <span>🇪🇬</span>
+                  <span>{{ lang.currentLang() === 'ar' ? 'ج.م' : 'EGP' }}</span>
+                </button>
+                <button 
+                  (click)="currency.setCurrency('USD')" 
+                  type="button"
+                  class="px-3 py-1 rounded-full transition-all flex items-center gap-1 cursor-pointer"
+                  [class.bg-[#1E2A4A]]="currency.selectedCurrency() === 'USD'"
+                  [class.text-white]="currency.selectedCurrency() === 'USD'"
+                  [class.text-slate-700]="currency.selectedCurrency() !== 'USD'"
+                >
+                  <span>🌐</span>
+                  <span>USD ($)</span>
+                </button>
+              </div>
+            </div>
+
             <div class="pt-4 border-t border-slate-200 mt-2 space-y-3">
               <button 
                 (click)="onRequestConsultation(); closeMobileMenu()"
@@ -190,6 +260,7 @@ import { LanguageService } from '../../../core/services/language.service';
 })
 export class NavbarComponent {
   public lang = inject(LanguageService);
+  public currency = inject(CurrencyService);
   @Output() openConsultation = new EventEmitter<void>();
 
   public isScrolled = signal<boolean>(false);

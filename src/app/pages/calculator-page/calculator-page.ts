@@ -25,6 +25,10 @@ export class CalculatorPage {
     phone: ['', [Validators.required, Validators.minLength(8)]]
   });
 
+  public formatNum(val: number | undefined | null): string {
+    return new Intl.NumberFormat('en-US').format(val || 0);
+  }
+
   public submitEstimate() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();

@@ -40,6 +40,8 @@ export interface ServiceItem {
   features: string[];
   technologies: string[];
   priceStart?: string;
+  priceUsd?: number;
+  priceEgp?: number;
 }
 
 export interface EstimatorOption {
