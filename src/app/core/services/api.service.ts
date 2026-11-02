@@ -1,8 +1,12 @@
-import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+﻿import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { HttpHeaders } from '@angular/common/http';
+import { LanguageService } from './language.service';
+import { catchError, map } from 'rxjs/operators';
+import { environment } from '../../Environment/environment';
 import { Project, ServiceItem } from '../models/project.model';
+import { ApiResponse, PagedData, Company } from '../../Models/api.models';
 
 export interface CompanyInfo {
   companyName: string;
@@ -78,38 +82,69 @@ export interface EstimateSubmitResponse {
 })
 export class ApiService {
   private http = inject(HttpClient);
+  private languageService = inject(LanguageService);
 
-  // Signal storing last real API response payload for transparent UI inspection
   public lastApiResponse = signal<ApiResponseMeta | null>(null);
   public isApiLoading = signal<boolean>(false);
   public apiError = signal<string | null>(null);
 
-  // Live Company Info from API
   public companyInfo = signal<CompanyInfo | null>(null);
 
   constructor() {
     this.loadCompanyInfo();
   }
 
-  // Fetch Company Info from /api/company-info.json
+  private normalizeUrl(url: string | null): string {
+    if (!url) return '';
+    if (url.startsWith('https://localhost:7233')) {
+      return url.replace('https://localhost:7233', 'http://localhost:5244');
+    }
+    if (url.startsWith('/')) {
+      return `http://localhost:5244${url}`;
+    }
+    return url;
+  }
+
   public loadCompanyInfo(): Observable<CompanyInfo | null> {
     const startTime = performance.now();
-    return this.http.get<CompanyInfo>('/api/company-info.json', { observe: 'response' }).pipe(
-      map(response => {
+    return this.http.get<ApiResponse<Company[]>>(`${environment.apiBaseUrl}/Company`, { observe: 'response' }).pipe(
+      map(res => {
         const endTime = performance.now();
-        const body = response.body;
-        if (body) {
-          this.companyInfo.set(body);
-          this.lastApiResponse.set({
-            endpoint: '/api/company-info.json',
-            statusCode: response.status || 200,
-            statusText: response.statusText || 'OK',
-            timestamp: new Date().toISOString(),
-            responseTimeMs: Math.round(endTime - startTime),
-            data: body
-          });
+        const apiData = res.body?.data;
+        let info: CompanyInfo | null = null;
+        if (apiData && apiData.length > 0) {
+          const comp = apiData[0];
+          info = {
+            companyName: comp.name || 'RunX Tech',
+            tagline: comp.vision || 'حلول رقمية برمجية متكاملة',
+            location: comp.contactInfo?.address || 'الرياض، المملكة العربية السعودية',
+            email: comp.contactInfo?.email || 'info@runxtech.com',
+            phone: comp.contactInfo?.phone || '+966500000000',
+            workingHours: 'الأحد - الخميس (9:00 ص - 6:00 م)',
+            stats: {
+              completedProjects: (comp as any).completedProjects || 100,
+              satisfiedClients: (comp as any).satisfiedClients || 99,
+              yearsOfExperience: comp.yearsOfExperience || 12,
+              uptimeGuarantee: (comp as any).uptimeGuarantee || '99.9%'
+            },
+            apiMeta: {
+              version: 'v1.0.0',
+              status: '200 OK (LIVE_BACKEND)',
+              environment: 'Development',
+              serverRegion: 'ASP.NET Core Server'
+            }
+          };
+          this.companyInfo.set(info);
         }
-        return body;
+        this.lastApiResponse.set({
+          endpoint: `${environment.apiBaseUrl}/Company`,
+          statusCode: res.status || 200,
+          statusText: res.statusText || 'OK',
+          timestamp: new Date().toISOString(),
+          responseTimeMs: Math.round(endTime - startTime),
+          data: apiData
+        });
+        return info;
       }),
       catchError(err => {
         this.apiError.set('تعذر تحميل بيانات الشركة من خادم API');
@@ -118,27 +153,98 @@ export class ApiService {
     );
   }
 
-  // Fetch Projects from /api/projects.json
+  private mapProjectDtoToProject(p: any): Project {
+    const lang = this.languageService.currentLang();
+    const title = lang === 'en' ? (p.nameEn || p.name) : (p.nameAr || p.name);
+    const description = lang === 'en' ? (p.descriptionEn || p.description) : (p.descriptionAr || p.description);
+    const client = lang === 'en' ? (p.clientEn || p.client) : (p.clientAr || p.client);
+    const duration = lang === 'en' ? (p.durationEn || p.duration) : (p.durationAr || p.duration);
+    const role = lang === 'en' ? (p.roleEn || p.role) : (p.roleAr || p.role);
+    const categoryName = lang === 'en' ? (p.categoryNameEn || p.categoryName || p.categoryLabel) : (p.categoryNameAr || p.categoryName || p.categoryLabel);
+    const keyFeaturesJson = lang === 'en' ? (p.keyFeaturesJsonEn || p.keyFeaturesJson) : (p.keyFeaturesJsonAr || p.keyFeaturesJson);
+    let technologies: string[] = ['ASP.NET Core', 'Angular', 'SQL Server'];
+    if (p.technologiesJson) {
+      try { technologies = JSON.parse(p.technologiesJson); } catch {}
+    }
+
+    let keyFeatures: string[] = [];
+    if (keyFeaturesJson) {
+      try { keyFeatures = JSON.parse(p.keyFeaturesJson); } catch {}
+    }
+
+    let metrics: any[] = [];
+    if (p.metricsJson) {
+      try { metrics = JSON.parse(p.metricsJson); } catch {}
+    }
+
+    let challengeSolution: any[] = [];
+    if (p.challengeSolutionsJson) {
+      try { challengeSolution = JSON.parse(p.challengeSolutionsJson); } catch {}
+    }
+
+    const categoryMap: { [key: string]: 'custom' | 'web' | 'mobile' | 'saas' | 'ecommerce' } = {
+      'منصات سحابية SaaS': 'saas',
+      'تجارة إلكترونية': 'ecommerce',
+      'تطبيقات جوال': 'mobile',
+      'مواقع شركات': 'web',
+      'أنظمة مخصصة': 'custom'
+    };
+
+    const catName = p.categoryName || '';
+    const categoryKey = categoryMap[catName] || 'custom';
+
+    const rawCover = p.coverImage || (p.images && p.images.length > 0 ? p.images[0].imageUrl : '');
+    const coverUrl = this.normalizeUrl(rawCover) || '/assets/images/saas_dashboard_preview_1786458589392.jpg';
+
+    const galleryImages: string[] = p.images ? p.images.map((i: any) => this.normalizeUrl(i.imageUrl)) : [coverUrl];
+
+    return {
+      id: p.id ? p.id.toString() : 'proj-' + Math.random(),
+      title: title,
+      category: categoryKey,
+      categoryLabel: categoryName || (lang === 'en' ? 'General' : 'عام'),
+      summary: description || '',
+      description: description || '',
+      imageUrl: coverUrl,
+      galleryImages: galleryImages.length > 0 ? galleryImages : [coverUrl],
+      client: client || (lang === 'en' ? 'Valued Client' : 'عميل مميز'),
+      duration: duration || (lang === 'en' ? 'Custom' : 'مخصص'),
+      role: role || (lang === 'en' ? 'Full-Stack Development' : 'تطوير وتنفيذ متكامل'),
+      liveUrl: p.liveUrl || '',
+      technologies: technologies,
+      featured: p.featured ?? true,
+      year: new Date(p.executionDate || Date.now()).getFullYear().toString(),
+      keyFeatures: keyFeatures,
+      metrics: metrics,
+      challengeSolution: challengeSolution
+    };
+  }
+
   public getProjects(): Observable<Project[]> {
     this.isApiLoading.set(true);
     const startTime = performance.now();
 
-    return this.http.get<Project[]>('/api/projects.json', { observe: 'response' }).pipe(
-      map(response => {
+    const currentLang = this.languageService.currentLang();
+    const headers = new HttpHeaders({ 'Accept-Language': currentLang });
+    return this.http.get<ApiResponse<PagedData<any>>>(`${environment.apiBaseUrl}/projects`, { headers, observe: 'response' }).pipe(
+      map(res => {
         const endTime = performance.now();
         this.isApiLoading.set(false);
-        const data = response.body || [];
+        const paged = res.body?.data;
+        const items = paged?.items || [];
         
+        const mappedProjects: Project[] = items.map((p: any) => this.mapProjectDtoToProject(p));
+
         this.lastApiResponse.set({
-          endpoint: '/api/projects.json',
-          statusCode: response.status || 200,
-          statusText: response.statusText || 'OK',
+          endpoint: `${environment.apiBaseUrl}/projects`,
+          statusCode: res.status || 200,
+          statusText: res.statusText || 'OK',
           timestamp: new Date().toISOString(),
           responseTimeMs: Math.round(endTime - startTime),
-          data: { totalProjects: data.length, sample: data.slice(0, 2) }
+          data: { totalProjects: mappedProjects.length, items: mappedProjects }
         });
 
-        return data;
+        return mappedProjects;
       }),
       catchError(err => {
         this.isApiLoading.set(false);
@@ -148,27 +254,66 @@ export class ApiService {
     );
   }
 
-  // Fetch Services from /api/services.json
+  public getProjectById(id: string): Observable<Project | null> {
+    return this.http.get<ApiResponse<any>>(`${environment.apiBaseUrl}/projects/${id}`).pipe(
+      map(res => {
+        const p = res.data;
+        if (!p) return null;
+        return this.mapProjectDtoToProject(p);
+      }),
+      catchError(() => of(null))
+    );
+  }
+
   public getServices(): Observable<ServiceItem[]> {
     this.isApiLoading.set(true);
     const startTime = performance.now();
 
-    return this.http.get<ServiceItem[]>('/api/services.json', { observe: 'response' }).pipe(
-      map(response => {
+    return this.http.get<ApiResponse<PagedData<any>>>(`${environment.apiBaseUrl}/services`, { observe: 'response' }).pipe(
+      map(res => {
         const endTime = performance.now();
         this.isApiLoading.set(false);
-        const data = response.body || [];
+        const paged = res.body?.data;
+        const items = paged?.items || [];
 
-        this.lastApiResponse.set({
-          endpoint: '/api/services.json',
-          statusCode: response.status || 200,
-          statusText: response.statusText || 'OK',
-          timestamp: new Date().toISOString(),
-          responseTimeMs: Math.round(endTime - startTime),
-          data: { totalServices: data.length }
+        const mappedServices: ServiceItem[] = items.map((s: any) => {
+          let features: string[] = s.description ? [s.description] : [];
+          if (s.featuresJson) {
+            try { features = JSON.parse(s.featuresJson); } catch {}
+          }
+
+          let technologies: string[] = ['C#', '.NET 8', 'Angular'];
+          if (s.technologiesJson) {
+            try { technologies = JSON.parse(s.technologiesJson); } catch {}
+          }
+
+          const rawImg = s.imageUrl;
+          const imgUrl = this.normalizeUrl(rawImg);
+
+          return {
+            id: s.id ? s.id.toString() : 'srv-' + Math.random(),
+            title: s.name,
+            subtitle: s.subtitle || s.categoryName || 'خدمات رقمية',
+            icon: 'code',
+            bootstrapIcon: s.bootstrapIcon || 'bi-code-slash',
+            imageUrl: imgUrl || undefined,
+            description: s.description || '',
+            features: features,
+            technologies: technologies,
+            priceStart: (s.priceStart !== null && s.priceStart !== undefined && s.priceStart !== '') ? (s.priceStart.toString().includes('يبدأ من') ? s.priceStart.toString() : 'يبدأ من ' + s.priceStart + ' $') : 'حسب النطاق'
+          };
         });
 
-        return data;
+        this.lastApiResponse.set({
+          endpoint: `${environment.apiBaseUrl}/services`,
+          statusCode: res.status || 200,
+          statusText: res.statusText || 'OK',
+          timestamp: new Date().toISOString(),
+          responseTimeMs: Math.round(endTime - startTime),
+          data: { totalServices: mappedServices.length }
+        });
+
+        return mappedServices;
       }),
       catchError(err => {
         this.isApiLoading.set(false);
@@ -178,87 +323,83 @@ export class ApiService {
     );
   }
 
-  // Submit Contact Form to API & return real returned payload
   public submitContact(reqData: ContactSubmitRequest): Observable<ContactSubmitResponse> {
     this.isApiLoading.set(true);
     const startTime = performance.now();
 
-    // Prepare real structured payload returned by the API
-    const refNumber = 'RUNX-REQ-' + Math.floor(100000 + Math.random() * 900000);
-    const mockResponse: ContactSubmitResponse = {
-      success: true,
-      referenceId: refNumber,
-      receivedAt: new Date().toLocaleString('ar-SA'),
-      status: '200 OK (RECEIVED_BY_SERVER)',
-      message: 'تم تسجيل طلب التواصل بنجاح لدى سيرفرات runx tech وتم تحويله للقسم التقني المختص.',
-      assignedEngineer: 'م. أحمد رضا - مهندس حلول سحابية',
-      submittedData: reqData
-    };
-
-    // Make an actual HTTP GET/POST via HttpClient to ensure network request executes
-    return this.http.get<any>('/api/company-info.json', { observe: 'response' }).pipe(
+    return this.http.post<ApiResponse<any>>(`${environment.apiBaseUrl}/contact/submit`, reqData, { observe: 'response' }).pipe(
       map(res => {
         const endTime = performance.now();
         this.isApiLoading.set(false);
+        const backendResp = res.body?.data || {};
+
+        const responseObj: ContactSubmitResponse = {
+          success: true,
+          referenceId: backendResp.referenceId || ('RUNX-REQ-' + Math.floor(100000 + Math.random() * 900000)),
+          receivedAt: backendResp.receivedAt || new Date().toLocaleString('ar-SA'),
+          status: '200 OK (SAVED_IN_DATABASE)',
+          message: backendResp.message || 'تم حفظ وتأكيد طلب التواصل بنجاح لدى خوادم runx tech.',
+          assignedEngineer: 'قسم الدعم الفني والحلول السحابية',
+          submittedData: reqData
+        };
 
         this.lastApiResponse.set({
-          endpoint: '/api/v1/contact/submit',
-          statusCode: 200,
-          statusText: '200 OK (Processed)',
+          endpoint: `${environment.apiBaseUrl}/contact/submit`,
+          statusCode: res.status || 200,
+          statusText: res.statusText || 'OK',
           timestamp: new Date().toISOString(),
-          responseTimeMs: Math.round(endTime - startTime + 80),
-          data: mockResponse
+          responseTimeMs: Math.round(endTime - startTime),
+          data: responseObj
         });
 
-        return mockResponse;
+        return responseObj;
       }),
-      catchError(() => {
+      catchError(err => {
         this.isApiLoading.set(false);
-        return of(mockResponse);
+        this.apiError.set('حدث خطأ أثناء إرسال طلب التواصل');
+        return throwError(() => err);
       })
     );
   }
 
-  // Submit Estimate / Price Quote Request to API
   public submitEstimate(reqData: EstimateSubmitRequest): Observable<EstimateSubmitResponse> {
     this.isApiLoading.set(true);
     const startTime = performance.now();
 
-    const refNumber = 'RUNX-EST-' + Math.floor(100000 + Math.random() * 900000);
-    const validDate = new Date();
-    validDate.setDate(validDate.getDate() + 30);
-
-    const mockResponse: EstimateSubmitResponse = {
-      success: true,
-      estimateReference: refNumber,
-      generatedAt: new Date().toLocaleString('ar-SA'),
-      validUntil: validDate.toLocaleDateString('ar-SA'),
-      priceUSD: reqData.estimatedPrice,
-      timelineDays: reqData.estimatedDays,
-      status: 'CONFIRMED_API_QUOTE',
-      summary: `تقدير أولي بقيمة ${reqData.estimatedPrice} $ ومد تسليم متوقعة ${reqData.estimatedDays} يوم عمل.`
-    };
-
-    return this.http.get<any>('/api/company-info.json', { observe: 'response' }).pipe(
+    return this.http.post<ApiResponse<any>>(`${environment.apiBaseUrl}/estimates/calculate`, reqData, { observe: 'response' }).pipe(
       map(res => {
         const endTime = performance.now();
         this.isApiLoading.set(false);
+        const backendResp = res.body?.data || {};
+
+        const responseObj: EstimateSubmitResponse = {
+          success: true,
+          estimateReference: backendResp.estimateReference || ('RUNX-EST-' + Math.floor(100000 + Math.random() * 900000)),
+          generatedAt: backendResp.generatedAt || new Date().toLocaleString('ar-SA'),
+          validUntil: backendResp.validUntil || new Date(Date.now() + 30 * 86400000).toLocaleDateString('ar-SA'),
+          priceUSD: reqData.estimatedPrice,
+          timelineDays: reqData.estimatedDays,
+          status: 'CONFIRMED_LIVE_QUOTE',
+          summary: backendResp.summary || `تقدير أولي بقيمة ${reqData.estimatedPrice} $ ومدة تسليم متوقعة ${reqData.estimatedDays} يوم عمل.`
+        };
 
         this.lastApiResponse.set({
-          endpoint: '/api/v1/estimates/calculate',
-          statusCode: 200,
-          statusText: '200 OK (Calculated)',
+          endpoint: `${environment.apiBaseUrl}/estimates/calculate`,
+          statusCode: res.status || 200,
+          statusText: res.statusText || 'OK',
           timestamp: new Date().toISOString(),
-          responseTimeMs: Math.round(endTime - startTime + 60),
-          data: mockResponse
+          responseTimeMs: Math.round(endTime - startTime),
+          data: responseObj
         });
 
-        return mockResponse;
+        return responseObj;
       }),
-      catchError(() => {
+      catchError(err => {
         this.isApiLoading.set(false);
-        return of(mockResponse);
+        this.apiError.set('حدث خطأ أثناء حساب وإرسال التقدير');
+        return throwError(() => err);
       })
     );
   }
 }
+

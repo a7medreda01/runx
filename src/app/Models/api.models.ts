@@ -1,4 +1,4 @@
-// ─── Generic API Response Wrappers ───────────────────────────────────────────
+﻿// ─── Generic API Response Wrappers ───────────────────────────────────────────
 
 export interface ApiResponse<T> {
   succeeded: boolean;
@@ -80,17 +80,22 @@ export interface Company {
   vision: string;
   mission: string;
   yearsOfExperience: number;
+  completedProjects: number;
+  satisfiedClients: number;
+  uptimeGuarantee: string;
   contactInfo: ContactInfo;
   socialMediaLinks: SocialMedia[];
 }
 
-// CompanyUpdateRequest uses FormData (multipart/form-data)
 export interface CompanyUpdateForm {
   Name: string;
   About?: string;
   Vision?: string;
   Mission?: string;
   YearsOfExperience?: number;
+  CompletedProjects?: number;
+  SatisfiedClients?: number;
+  UptimeGuarantee?: string;
   Logo?: File;
   CoverImage?: File;
 }
@@ -114,16 +119,25 @@ export interface ServiceCategoryRequest {
 export interface Service {
   id: number;
   name: string;
+  subtitle?: string;
   description: string;
   imageUrl: string | null;
+  bootstrapIcon?: string;
+  priceStart?: string;
+  featuresJson?: string;
+  technologiesJson?: string;
   serviceCategoryId: number;
   categoryName: string;
 }
 
-// Service create/update uses FormData (multipart/form-data)
 export interface ServiceForm {
   Name: string;
+  Subtitle?: string;
   Description: string;
+  BootstrapIcon?: string;
+  PriceStart?: string;
+  FeaturesJson?: string;
+  TechnologiesJson?: string;
   ServiceCategoryId: number;
   Image?: File;
 }
@@ -152,7 +166,6 @@ export interface Package {
   features: PackageFeature[];
 }
 
-// Package create/update uses FormData (multipart/form-data)
 export interface PackageForm {
   Name: string;
   Price: number;
@@ -173,19 +186,64 @@ export interface Project {
   name: string;
   description: string;
   coverImage: string | null;
+  client?: string;
+  duration?: string;
+  role?: string;
+  liveUrl?: string;
+  featured?: boolean;
   executionDate: string;
+  technologiesJson?: string;
+  keyFeaturesJson?: string;
+  metricsJson?: string;
+  challengeSolutionsJson?: string;
   serviceCategoryId: number;
   categoryName: string;
   images: ProjectImage[];
 }
 
-// Project create/update uses FormData (multipart/form-data)
 export interface ProjectForm {
   Name: string;
   Description: string;
+  Client?: string;
+  Duration?: string;
+  Role?: string;
+  LiveUrl?: string;
+  Featured?: boolean;
   ExecutionDate: string;
+  TechnologiesJson?: string;
+  KeyFeaturesJson?: string;
+  MetricsJson?: string;
+  ChallengeSolutionsJson?: string;
   ServiceCategoryId: number;
   Image?: File;
+}
+
+// ─── Submissions ─────────────────────────────────────────────────────────────
+
+export interface ContactSubmission {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  subject: string;
+  message: string;
+  referenceId: string;
+  createdAt: string;
+  status: string;
+}
+
+export interface EstimateSubmission {
+  id: number;
+  projectType: string;
+  addonsJson: string;
+  timeline: string;
+  estimatedPrice: number;
+  estimatedDays: number;
+  clientName?: string;
+  clientContact?: string;
+  referenceId: string;
+  createdAt: string;
+  status: string;
 }
 
 // ─── Pagination Params ───────────────────────────────────────────────────────

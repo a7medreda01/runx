@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AdminAuthService } from '../admin-auth.service';
@@ -18,6 +18,7 @@ import { ProjectManageComponent } from '../components/project-manage/project-man
 import { PackageManageComponent } from '../components/package-manage/package-manage';
 import { ContactSocialManageComponent } from '../components/contact-social-manage/contact-social-manage';
 import { SiteSettingManageComponent } from '../components/site-setting-manage/site-setting-manage';
+import { CalculatorManageComponent } from '../components/calculator-manage/calculator-manage';
 
 @Component({
   selector: 'app-admin-panel',
@@ -31,14 +32,15 @@ import { SiteSettingManageComponent } from '../components/site-setting-manage/si
     ProjectManageComponent,
     PackageManageComponent,
     ContactSocialManageComponent,
-    SiteSettingManageComponent
+    SiteSettingManageComponent,
+    CalculatorManageComponent
   ],
   templateUrl: './panel.component.html',
   styleUrl: './panel.component.css'
 })
 export class AdminPanelComponent implements OnInit {
-  activeTab = 'overview';
-  mobileSidebarOpen = false;
+  public activeTab = signal<string>('overview');
+  public mobileSidebarOpen = signal<boolean>(false);
 
   // Overview statistics
   stats = {
@@ -99,8 +101,8 @@ export class AdminPanelComponent implements OnInit {
   }
 
   switchTab(tab: string): void {
-    this.activeTab = tab;
-    this.mobileSidebarOpen = false;
+    this.activeTab.set(tab);
+    this.mobileSidebarOpen.set(false);
     
     if (tab === 'overview') {
       this.loadStats();
@@ -108,7 +110,7 @@ export class AdminPanelComponent implements OnInit {
   }
 
   toggleMobileSidebar(): void {
-    this.mobileSidebarOpen = !this.mobileSidebarOpen;
+    this.mobileSidebarOpen.update(v => !v);
   }
 
   onLogout(): void {

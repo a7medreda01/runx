@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../Environment/environment.prod';
+import { environment } from '../Environment/environment';
 import {
   ApiResponse,
   PagedData,
@@ -28,7 +28,6 @@ export class ProjectService {
     return this.http.get<ApiResponse<Project>>(`${this.baseUrl}/${id}`);
   }
 
-  /** Get all projects belonging to a specific service category */
   getByCategory(categoryId: number): Observable<ApiResponse<Project[]>> {
     return this.http.get<ApiResponse<Project[]>>(`${this.baseUrl}/category/${categoryId}`);
   }
@@ -45,36 +44,15 @@ export class ProjectService {
     return this.http.delete<ApiResponse<any>>(`${this.baseUrl}/${id}`);
   }
 
-  /**
-   * Add a single image to an existing project.
-   * POST /api/projects/{projectId}/images  — field: "File"
-   */
   addImage(projectId: number, file: File): Observable<ApiResponse<ProjectImage>> {
     const fd = new FormData();
     fd.append('File', file);
     return this.http.post<ApiResponse<ProjectImage>>(`${this.baseUrl}/${projectId}/images`, fd);
   }
 
-  /**
-   * Delete a specific project image by its ID.
-   * DELETE /api/projects/images/{imageId}
-   */
   deleteImage(imageId: number): Observable<ApiResponse<any>> {
     return this.http.delete<ApiResponse<any>>(`${this.baseUrl}/images/${imageId}`);
   }
-
-  /**
-   * @deprecated Use addImage() in a loop instead.
-   * Upload one or more images to an existing project.
-   */
-  uploadImages(projectId: number, images: File[]): Observable<ApiResponse<any>> {
-    const fd = new FormData();
-    fd.append('projectId', projectId.toString());
-    images.forEach(img => fd.append('Images', img));
-    return this.http.post<ApiResponse<any>>(`${this.baseUrl}/upload-images`, fd);
-  }
-
-  // ─── Helpers ───────────────────────────────────────────────────────────────
 
   private buildFormData(form: ProjectForm): FormData {
     const fd = new FormData();
@@ -82,6 +60,15 @@ export class ProjectService {
     fd.append('Description', form.Description);
     fd.append('ExecutionDate', form.ExecutionDate);
     fd.append('ServiceCategoryId', form.ServiceCategoryId.toString());
+    if (form.Client) fd.append('Client', form.Client);
+    if (form.Duration) fd.append('Duration', form.Duration);
+    if (form.Role) fd.append('Role', form.Role);
+    if (form.LiveUrl) fd.append('LiveUrl', form.LiveUrl);
+    if (form.Featured !== undefined) fd.append('Featured', form.Featured.toString());
+    if (form.TechnologiesJson) fd.append('TechnologiesJson', form.TechnologiesJson);
+    if (form.KeyFeaturesJson) fd.append('KeyFeaturesJson', form.KeyFeaturesJson);
+    if (form.MetricsJson) fd.append('MetricsJson', form.MetricsJson);
+    if (form.ChallengeSolutionsJson) fd.append('ChallengeSolutionsJson', form.ChallengeSolutionsJson);
     if (form.Image) fd.append('Image', form.Image);
     return fd;
   }

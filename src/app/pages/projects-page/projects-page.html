@@ -1,0 +1,47 @@
+<div class="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10 space-y-12">
+  
+  <div class="text-center space-y-4 max-w-3xl mx-auto">
+    <span class="runx-glass-pill text-xs">{{ lang.t()['nav_projects'] }}</span>
+    <h1 class="text-3xl sm:text-5xl font-bold font-display text-slate-900">{{ lang.t()['projects_title'] }}</h1>
+    <p class="subtext-lead text-slate-700">
+      {{ lang.t()['projects_subtitle'] }}
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    @for (project of projectsService.filteredProjects(); track project.id) {
+      <div [routerLink]="['/projects', project.id]" class="runx-card overflow-hidden group cursor-pointer flex flex-col justify-between rounded-3xl border border-slate-200/90 bg-white shadow-sm hover:shadow-xl transition-all">
+        <div>
+          <div class="relative h-56 bg-slate-100 overflow-hidden">
+            <img [src]="project.imageUrl" [alt]="project.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" referrerpolicy="no-referrer">
+            <span class="absolute top-3 right-3 px-3 py-1 rounded-full bg-white/95 text-[#C1662F] text-xs font-bold shadow-xs border border-slate-200">
+              {{ project.categoryLabel }}
+            </span>
+          </div>
+          <div class="p-6 space-y-3">
+            <h3 class="text-xl font-bold font-display text-slate-900 group-hover:text-[#C1662F] transition-colors">
+              {{ project.title }}
+            </h3>
+            <p class="subtext-card text-slate-600 text-xs sm:text-sm line-clamp-3 leading-relaxed">
+              {{ project.summary }}
+            </p>
+            <div class="flex flex-wrap gap-1.5 pt-2">
+              @for (tech of project.technologies; track tech) {
+                <span class="runx-tag text-xs">{{ tech }}</span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+          <span>{{ lang.currentLang() === 'ar' ? 'العميل:' : 'Client:' }} {{ project.client }}</span>
+          <span class="text-[#C1662F] font-bold flex items-center gap-1">
+            <span>{{ lang.t()['projects_view_details'] }}</span>
+            <i class="bi" [class.bi-arrow-left]="lang.dir() === 'rtl'" [class.bi-arrow-right]="lang.dir() === 'ltr'"></i>
+          </span>
+        </div>
+      </div>
+    }
+  </div>
+
+</div>

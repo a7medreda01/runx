@@ -1,6 +1,6 @@
 <div class="panel-layout">
   <!-- Sidebar -->
-  <aside class="sidebar" [class.mobile-open]="mobileSidebarOpen">
+  <aside class="sidebar" [class.mobile-open]="mobileSidebarOpen()">
     <div class="sidebar-header">
       <div class="logo-circle">
         <i class="bi bi-speedometer2"></i>
@@ -12,35 +12,39 @@
     </div>
 
     <nav class="sidebar-menu">
-      <button (click)="switchTab('overview')" [class.active]="activeTab === 'overview'">
+      <button (click)="switchTab('overview')" [class.active]="activeTab() === 'overview'">
         <i class="bi bi-grid-1x2-fill"></i> نظرة عامة
       </button>
 
-      <button (click)="switchTab('company')" [class.active]="activeTab === 'company'">
+      <button (click)="switchTab('company')" [class.active]="activeTab() === 'company'">
         <i class="bi bi-building-fill"></i> بيانات الشركة
       </button>
 
-      <button (click)="switchTab('categories')" [class.active]="activeTab === 'categories'">
+      <button (click)="switchTab('categories')" [class.active]="activeTab() === 'categories'">
         <i class="bi bi-tags-fill"></i> تصنيفات الخدمات
       </button>
 
-      <button (click)="switchTab('services')" [class.active]="activeTab === 'services'">
+      <button (click)="switchTab('services')" [class.active]="activeTab() === 'services'">
         <i class="bi bi-briefcase-fill"></i> خدمات الشركة
       </button>
 
-      <button (click)="switchTab('projects')" [class.active]="activeTab === 'projects'">
+      <button (click)="switchTab('projects')" [class.active]="activeTab() === 'projects'">
         <i class="bi bi-images"></i> معرض المشاريع
       </button>
 
-      <button (click)="switchTab('packages')" [class.active]="activeTab === 'packages'">
+      <button (click)="switchTab('packages')" [class.active]="activeTab() === 'packages'">
         <i class="bi bi-currency-dollar"></i> باقات الأسعار
       </button>
 
-      <button (click)="switchTab('contact-social')" [class.active]="activeTab === 'contact-social'">
+      <button (click)="switchTab('contact-social')" [class.active]="activeTab() === 'contact-social'">
         <i class="bi bi-telephone-outbound-fill"></i> الاتصال والتواصل
       </button>
 
-      <button (click)="switchTab('settings')" [class.active]="activeTab === 'settings'">
+      <button (click)="switchTab('calculator')" [class.active]="activeTab() === 'calculator'">
+        <i class="bi bi-calculator-fill"></i> حاسبة الأسعار والطلبات
+      </button>
+
+      <button (click)="switchTab('settings')" [class.active]="activeTab() === 'settings'">
         <i class="bi bi-gear-wide-connected"></i> إعدادات الموقع
       </button>
     </nav>
@@ -53,7 +57,9 @@
   </aside>
 
   <!-- Sidebar mobile backdrop -->
-  <div *ngIf="mobileSidebarOpen" class="sidebar-backdrop" (click)="toggleMobileSidebar()"></div>
+  @if (mobileSidebarOpen()) {
+    <div class="sidebar-backdrop" (click)="toggleMobileSidebar()"></div>
+  }
 
   <!-- Main Container -->
   <main class="main-content">
@@ -64,14 +70,15 @@
           <i class="bi bi-list"></i>
         </button>
         <h2 class="active-title">
-          <span *ngIf="activeTab === 'overview'">لوحة التحكم الرئيسية</span>
-          <span *ngIf="activeTab === 'company'">بيانات وتفاصيل الشركة</span>
-          <span *ngIf="activeTab === 'categories'">إدارة تصنيفات الخدمات</span>
-          <span *ngIf="activeTab === 'services'">إدارة الخدمات</span>
-          <span *ngIf="activeTab === 'projects'">إدارة معرض المشاريع</span>
-          <span *ngIf="activeTab === 'packages'">إدارة الباقات والأسعار</span>
-          <span *ngIf="activeTab === 'contact-social'">بيانات الاتصال والتواصل الاجتماعي</span>
-          <span *ngIf="activeTab === 'settings'">إعدادات الموقع العامة</span>
+          @if (activeTab() === 'overview') { <span>لوحة التحكم الرئيسية</span> }
+          @if (activeTab() === 'company') { <span>بيانات وتفاصيل الشركة</span> }
+          @if (activeTab() === 'categories') { <span>إدارة تصنيفات الخدمات</span> }
+          @if (activeTab() === 'services') { <span>إدارة الخدمات</span> }
+          @if (activeTab() === 'projects') { <span>إدارة معرض المشاريع</span> }
+          @if (activeTab() === 'packages') { <span>إدارة الباقات والأسعار</span> }
+          @if (activeTab() === 'contact-social') { <span>بيانات الاتصال والتواصل الاجتماعي</span> }
+          @if (activeTab() === 'calculator') { <span>حاسبة الأسعار والطلبات</span> }
+          @if (activeTab() === 'settings') { <span>إعدادات الموقع العامة</span> }
         </h2>
       </div>
 
@@ -89,7 +96,9 @@
     <div class="content-wrapper">
       
       <!-- Tab 1: Overview Dashboard -->
-      <div *ngIf="activeTab === 'overview'" class="overview-dashboard animate-fade-in">
+      @if (activeTab() === 'overview') {
+        <div class="overview-dashboard animate-fade-in">
+          
         <div class="welcome-banner">
           <h1>مرحباً بك مجدداً في لوحة التحكم!</h1>
           <p>أنت تقوم بإدارة محتوى موقع: <strong>{{ stats.companyName }}</strong></p>
@@ -182,42 +191,48 @@
             </table>
           </div>
         </div>
-      </div>
+      
+        </div>
+      }
 
       <!-- Tab 2: Company Management -->
-      <div *ngIf="activeTab === 'company'">
+      @if (activeTab() === 'company') {
         <app-company-manage></app-company-manage>
-      </div>
+      }
 
       <!-- Tab 3: Service Categories Management -->
-      <div *ngIf="activeTab === 'categories'">
+      @if (activeTab() === 'categories') {
         <app-category-manage></app-category-manage>
-      </div>
+      }
 
       <!-- Tab 4: Services Management -->
-      <div *ngIf="activeTab === 'services'">
+      @if (activeTab() === 'services') {
         <app-service-manage></app-service-manage>
-      </div>
+      }
 
       <!-- Tab 5: Projects Management -->
-      <div *ngIf="activeTab === 'projects'">
+      @if (activeTab() === 'projects') {
         <app-project-manage></app-project-manage>
-      </div>
+      }
 
       <!-- Tab 6: Packages Management -->
-      <div *ngIf="activeTab === 'packages'">
+      @if (activeTab() === 'packages') {
         <app-package-manage></app-package-manage>
-      </div>
+      }
 
       <!-- Tab 7: Contact and Social Links -->
-      <div *ngIf="activeTab === 'contact-social'">
+      @if (activeTab() === 'contact-social') {
         <app-contact-social-manage></app-contact-social-manage>
-      </div>
+      }
 
       <!-- Tab 8: Site Settings Management -->
-      <div *ngIf="activeTab === 'settings'">
+      @if (activeTab() === 'calculator') {
+        <app-calculator-manage></app-calculator-manage>
+      }
+
+      @if (activeTab() === 'settings') {
         <app-site-setting-manage></app-site-setting-manage>
-      </div>
+      }
 
     </div>
   </main>

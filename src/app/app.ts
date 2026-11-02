@@ -1,5 +1,7 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, signal, inject } from '@angular/core';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { NgIf } from '@angular/common';
+import { filter } from 'rxjs/operators';
 import { NavbarComponent } from './shared/ui/navbar/navbar';
 import { FooterComponent } from './shared/ui/footer/footer';
 import { ContactModalComponent } from './shared/ui/contact-modal/contact-modal';
@@ -7,18 +9,16 @@ import { ContactModalComponent } from './shared/ui/contact-modal/contact-modal';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, FooterComponent, ContactModalComponent],
+  imports: [RouterOutlet, NavbarComponent, FooterComponent, ContactModalComponent, NgIf],
   template: `
-    <div class="min-h-screen flex flex-col bg-white text-slate-800 selection:bg-[#C1662F] selection:text-white relative overflow-x-hidden">
+    <div [class]="isAdminRoute() ? 'w-full h-full min-h-screen bg-[#0d0e15]' : 'min-h-screen flex flex-col bg-white text-slate-800 selection:bg-[#C1662F] selection:text-white relative overflow-x-hidden'">
       
-      <!-- Top-Right Corner Tech Network Mesh (Ultra Subtle Navy/Slate) -->
-      <div class="fixed top-0 right-0 w-[180px] sm:w-[260px] md:w-[320px] h-[180px] sm:h-[260px] md:h-[320px] pointer-events-none z-0 overflow-hidden opacity-15 sm:opacity-20">
+      <!-- Top-Right Corner Tech Network Mesh (Only on Public Pages) -->
+      <div *ngIf="!isAdminRoute()" class="fixed top-0 right-0 w-[180px] sm:w-[260px] md:w-[320px] h-[180px] sm:h-[260px] md:h-[320px] pointer-events-none z-0 overflow-hidden opacity-15 sm:opacity-20">
         <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
           <path d="M400 20 L350 35 L380 90 L320 80 L360 140 L290 130 L340 190 L385 180" stroke="#1E2A4A" stroke-width="0.8" stroke-opacity="0.2"/>
           <path d="M350 35 L320 80 L290 130 M380 90 L360 140 L340 190" stroke="#1E2A4A" stroke-width="0.6" stroke-opacity="0.15"/>
           <path d="M400 90 L380 90 L385 180 M350 35 L400 70 M320 80 L380 90" stroke="#1E2A4A" stroke-width="0.5" stroke-opacity="0.12"/>
-
-          <!-- Node Dots -->
           <circle cx="350" cy="35" r="2.5" fill="#1E2A4A" fill-opacity="0.5"/>
           <circle cx="380" cy="90" r="2.5" fill="#1E2A4A" fill-opacity="0.5"/>
           <circle cx="320" cy="80" r="3" fill="#3B82F6" fill-opacity="0.6"/>
@@ -28,8 +28,8 @@ import { ContactModalComponent } from './shared/ui/contact-modal/contact-modal';
         </svg>
       </div>
 
-      <!-- Bottom-Left Corner Tech Network Mesh (Ultra Subtle Copper Glow) -->
-      <div class="fixed bottom-0 left-0 w-[180px] sm:w-[260px] md:w-[320px] h-[180px] sm:h-[260px] md:h-[320px] pointer-events-none z-0 overflow-hidden opacity-20 sm:opacity-25">
+      <!-- Bottom-Left Corner Tech Network Mesh (Only on Public Pages) -->
+      <div *ngIf="!isAdminRoute()" class="fixed bottom-0 left-0 w-[180px] sm:w-[260px] md:w-[320px] h-[180px] sm:h-[260px] md:h-[320px] pointer-events-none z-0 overflow-hidden opacity-20 sm:opacity-25">
         <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
           <defs>
             <radialGradient id="copperGlow" cx="0" cy="400" r="250" gradientUnits="userSpaceOnUse">
@@ -38,14 +38,9 @@ import { ContactModalComponent } from './shared/ui/contact-modal/contact-modal';
               <stop offset="100%" stop-color="#C1662F" stop-opacity="0" />
             </radialGradient>
           </defs>
-          
           <rect width="400" height="400" fill="url(#copperGlow)"/>
-
-          <!-- Network Mesh Lines -->
           <path d="M0 380 L60 350 L35 290 L100 300 L60 240 L140 250 M60 350 L100 300 L140 250 M35 290 L60 240" stroke="#C1662F" stroke-width="0.8" stroke-opacity="0.25"/>
           <path d="M0 330 L35 290 M60 350 L35 290 M100 300 L60 240" stroke="#E28A4A" stroke-width="0.6" stroke-opacity="0.18"/>
-
-          <!-- Node Dots -->
           <circle cx="60" cy="350" r="2.5" fill="#C1662F" fill-opacity="0.6"/>
           <circle cx="35" cy="290" r="3" fill="#E28A4A" fill-opacity="0.7"/>
           <circle cx="100" cy="300" r="3" fill="#C1662F" fill-opacity="0.7"/>
@@ -54,19 +49,20 @@ import { ContactModalComponent } from './shared/ui/contact-modal/contact-modal';
         </svg>
       </div>
       
-      <!-- Top Sticky Navigation -->
-      <app-navbar class="relative z-20" (openConsultation)="consultationModalOpen.set(true)"></app-navbar>
+      <!-- Top Sticky Navigation (Only for Public Website) -->
+      <app-navbar *ngIf="!isAdminRoute()" class="relative z-20" (openConsultation)="consultationModalOpen.set(true)"></app-navbar>
 
       <!-- Main Page Content Route Outlet -->
-      <main class="flex-grow relative z-10">
+      <main [class]="isAdminRoute() ? 'w-full h-full' : 'flex-grow relative z-10'">
         <router-outlet></router-outlet>
       </main>
 
-      <!-- Footer -->
-      <app-footer class="relative z-20"></app-footer>
+      <!-- Footer (Only for Public Website) -->
+      <app-footer *ngIf="!isAdminRoute()" class="relative z-20"></app-footer>
 
-      <!-- Consultation Quick Modal -->
+      <!-- Consultation Quick Modal (Only for Public Website) -->
       <app-contact-modal 
+        *ngIf="!isAdminRoute()"
         [isOpen]="consultationModalOpen()" 
         (close)="consultationModalOpen.set(false)"
       ></app-contact-modal>
@@ -75,5 +71,21 @@ import { ContactModalComponent } from './shared/ui/contact-modal/contact-modal';
   `
 })
 export class App {
+  private router = inject(Router);
   public consultationModalOpen = signal<boolean>(false);
+  public isAdminRoute = signal<boolean>(false);
+
+  constructor() {
+    this.checkRoute(this.router.url);
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      this.checkRoute(event.urlAfterRedirects || event.url);
+    });
+  }
+
+  private checkRoute(url: string) {
+    const isAdmin = url ? (url.startsWith('/admin') || url.includes('/admin')) : false;
+    this.isAdminRoute.set(isAdmin);
+  }
 }

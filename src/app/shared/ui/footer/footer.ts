@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { LanguageService } from '../../../core/services/language.service';
 
 @Component({
   selector: 'app-footer',
@@ -15,7 +16,7 @@ import { RouterLink } from '@angular/router';
           <div class="lg:col-span-2 space-y-5">
             <a routerLink="/" class="flex items-center gap-3 group inline-flex">
               <div class="w-10 h-10 rounded-xl bg-[#1E2A4A] border border-[#C1662F]/40 p-1.5 flex items-center justify-center shadow-md">
-                <img src="/logo.svg" alt="runx tech" class="w-full h-full object-contain">
+                <img src="/logo.png" alt="runx tech" class="w-full h-full object-contain">
               </div>
               <div class="flex flex-col">
                 <span class="font-display text-2xl font-bold text-white tracking-wide">
@@ -28,46 +29,46 @@ import { RouterLink } from '@angular/router';
             </a>
 
             <p class="subtext-card text-slate-300 max-w-md">
-              شركة <strong class="text-white font-bold">runx tech</strong> متخصصة في ابتكار وتطوير المواقع الفاخرة، المتاجر الإلكترونية، وتطبيقات الجوال والأنظمة السحابية للشركات الناشئة والمؤسسات، بأحدث التقنيات وبأعلى معايير الجودة والأمان.
+              {{ lang.t()['footer_tagline'] }}
             </p>
 
             <div class="flex items-center gap-3 pt-2">
               <span class="px-3.5 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-emerald-400 text-xs font-semibold flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                متاحون للمشاريع الجديدة 2025
+                <span>{{ lang.currentLang() === 'ar' ? 'متاحون للمشاريع الجديدة 2026' : 'Available for New Projects 2026' }}</span>
               </span>
             </div>
           </div>
 
           <!-- Quick Links -->
           <div class="space-y-4">
-            <h4 class="text-white font-bold text-base font-display border-r-3 border-[#C1662F] pr-3">
-              روابط السريعة
+            <h4 class="text-white font-bold text-base font-display border-[#C1662F]" [class.border-r-3]="lang.dir() === 'rtl'" [class.border-l-3]="lang.dir() === 'ltr'" [class.pr-3]="lang.dir() === 'rtl'" [class.pl-3]="lang.dir() === 'ltr'">
+              {{ lang.t()['footer_quick_links'] }}
             </h4>
             <ul class="space-y-2.5 text-sm text-slate-400">
               <li>
                 <a routerLink="/" class="hover:text-[#C1662F] transition-colors flex items-center gap-2">
-                  <span>‹</span> الرئيسية
+                  <span>{{ lang.dir() === 'rtl' ? '‹' : '›' }}</span> {{ lang.t()['nav_home'] }}
                 </a>
               </li>
               <li>
                 <a routerLink="/services" class="hover:text-[#C1662F] transition-colors flex items-center gap-2">
-                  <span>‹</span> خدمات البرمجة
+                  <span>{{ lang.dir() === 'rtl' ? '‹' : '›' }}</span> {{ lang.t()['nav_services'] }}
                 </a>
               </li>
               <li>
                 <a routerLink="/projects" class="hover:text-[#C1662F] transition-colors flex items-center gap-2">
-                  <span>‹</span> معرض الأعمال
+                  <span>{{ lang.dir() === 'rtl' ? '‹' : '›' }}</span> {{ lang.t()['nav_projects'] }}
                 </a>
               </li>
               <li>
                 <a routerLink="/calculator" class="hover:text-[#C1662F] transition-colors flex items-center gap-2 text-[#C1662F]">
-                  <span>‹</span> حاسبة تكلفة المشروع
+                  <span>{{ lang.dir() === 'rtl' ? '‹' : '›' }}</span> {{ lang.t()['nav_calculator'] }}
                 </a>
               </li>
               <li>
                 <a routerLink="/contact" class="hover:text-[#C1662F] transition-colors flex items-center gap-2">
-                  <span>‹</span> تواصل معنا
+                  <span>{{ lang.dir() === 'rtl' ? '‹' : '›' }}</span> {{ lang.t()['nav_contact'] }}
                 </a>
               </li>
             </ul>
@@ -75,33 +76,28 @@ import { RouterLink } from '@angular/router';
 
           <!-- Our Services -->
           <div class="space-y-4">
-            <h4 class="text-white font-bold text-base font-display border-r-3 border-[#C1662F] pr-3">
-              خدماتنا
+            <h4 class="text-white font-bold text-base font-display border-[#C1662F]" [class.border-r-3]="lang.dir() === 'rtl'" [class.border-l-3]="lang.dir() === 'ltr'" [class.pr-3]="lang.dir() === 'rtl'" [class.pl-3]="lang.dir() === 'ltr'">
+              {{ lang.t()['footer_services'] }}
             </h4>
             <ul class="space-y-2.5 text-sm text-slate-400">
               <li>
                 <a routerLink="/services" class="hover:text-[#C1662F] transition-colors">
-                  تطوير مواقع الشركات
+                  {{ lang.currentLang() === 'ar' ? 'تطوير مواقع الشركات' : 'Corporate Web Development' }}
                 </a>
               </li>
               <li>
                 <a routerLink="/services" class="hover:text-[#C1662F] transition-colors">
-                  المتاجر الإلكترونية المخصصة
+                  {{ lang.currentLang() === 'ar' ? 'المتاجر الإلكترونية المخصصة' : 'E-Commerce Systems' }}
                 </a>
               </li>
               <li>
                 <a routerLink="/services" class="hover:text-[#C1662F] transition-colors">
-                  تطبيقات الآيفون والأندرويد
+                  {{ lang.currentLang() === 'ar' ? 'تطبيقات iOS والأندرويد' : 'Mobile Apps (iOS & Android)' }}
                 </a>
               </li>
               <li>
                 <a routerLink="/services" class="hover:text-[#C1662F] transition-colors">
-                  تصميم واجهات UI/UX
-                </a>
-              </li>
-              <li>
-                <a routerLink="/services" class="hover:text-[#C1662F] transition-colors">
-                  الأنظمة السحابية SaaS
+                  {{ lang.currentLang() === 'ar' ? 'الأنظمة السحابية SaaS' : 'SaaS & Cloud Platforms' }}
                 </a>
               </li>
             </ul>
@@ -109,8 +105,8 @@ import { RouterLink } from '@angular/router';
 
           <!-- Contact Info -->
           <div class="space-y-4">
-            <h4 class="text-white font-bold text-base font-display border-r-3 border-[#C1662F] pr-3">
-              معلومات التواصل
+            <h4 class="text-white font-bold text-base font-display border-[#C1662F]" [class.border-r-3]="lang.dir() === 'rtl'" [class.border-l-3]="lang.dir() === 'ltr'" [class.pr-3]="lang.dir() === 'rtl'" [class.pl-3]="lang.dir() === 'ltr'">
+              {{ lang.t()['footer_contact_us'] }}
             </h4>
             <ul class="space-y-3 text-sm text-slate-300">
               <li class="flex items-start gap-3">
@@ -118,14 +114,14 @@ import { RouterLink } from '@angular/router';
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span>الرياض، المملكة العربية السعودية</span>
+                <span>{{ lang.currentLang() === 'ar' ? 'الرياض، المملكة العربية السعودية' : 'Riyadh, Kingdom of Saudi Arabia' }}</span>
               </li>
               <li class="flex items-center gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#C1662F] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
                 <a href="mailto:contact@runxtech.com" class="hover:text-[#C1662F] dir-ltr inline-block">
-                  contact&#64;runxtech.com
+                  info&#64;runxtech.com
                 </a>
               </li>
               <li class="flex items-center gap-3">
@@ -143,11 +139,10 @@ import { RouterLink } from '@angular/router';
 
         <!-- Copyright & Legal -->
         <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
-          <p>© 2025 <strong class="text-white">runx tech</strong>. جميع الحقوق محفوظة لشركة رَن إكس للحلول التقنية.</p>
+          <p>{{ lang.t()['footer_rights'] }}</p>
           <div class="flex items-center gap-6">
-            <span class="hover:text-white transition-colors cursor-pointer">سياسة الخصوصية</span>
-            <span class="hover:text-white transition-colors cursor-pointer">الشروط والأحكام</span>
-            <span class="hover:text-white transition-colors cursor-pointer">دليل الهوية الرقمية</span>
+            <span class="hover:text-white transition-colors cursor-pointer">{{ lang.currentLang() === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy' }}</span>
+            <span class="hover:text-white transition-colors cursor-pointer">{{ lang.currentLang() === 'ar' ? 'الشروط والأحكام' : 'Terms & Conditions' }}</span>
           </div>
         </div>
 
@@ -155,4 +150,6 @@ import { RouterLink } from '@angular/router';
     </footer>
   `
 })
-export class FooterComponent {}
+export class FooterComponent {
+  public lang = inject(LanguageService);
+}

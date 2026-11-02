@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../Environment/environment.prod';
+import { environment } from '../Environment/environment';
 import {
   ApiResponse,
   PagedData,
@@ -27,7 +27,6 @@ export class ServiceService {
     return this.http.get<ApiResponse<Service>>(`${this.baseUrl}/${id}`);
   }
 
-  /** Get all services belonging to a specific category */
   getByCategory(categoryId: number): Observable<ApiResponse<Service[]>> {
     return this.http.get<ApiResponse<Service[]>>(`${this.baseUrl}/category/${categoryId}`);
   }
@@ -44,7 +43,6 @@ export class ServiceService {
     return this.http.delete<ApiResponse<any>>(`${this.baseUrl}/${id}`);
   }
 
-  /** Upload a single image for an existing service */
   uploadImage(serviceId: number, image: File): Observable<ApiResponse<any>> {
     const fd = new FormData();
     fd.append('serviceId', serviceId.toString());
@@ -52,13 +50,16 @@ export class ServiceService {
     return this.http.post<ApiResponse<any>>(`${this.baseUrl}/upload-image`, fd);
   }
 
-  // ─── Helpers ───────────────────────────────────────────────────────────────
-
   private buildFormData(form: ServiceForm): FormData {
     const fd = new FormData();
     fd.append('Name', form.Name);
     fd.append('Description', form.Description);
     fd.append('ServiceCategoryId', form.ServiceCategoryId.toString());
+    if (form.Subtitle) fd.append('Subtitle', form.Subtitle);
+    if (form.BootstrapIcon) fd.append('BootstrapIcon', form.BootstrapIcon);
+    if (form.PriceStart) fd.append('PriceStart', form.PriceStart);
+    if (form.FeaturesJson) fd.append('FeaturesJson', form.FeaturesJson);
+    if (form.TechnologiesJson) fd.append('TechnologiesJson', form.TechnologiesJson);
     if (form.Image) fd.append('Image', form.Image);
     return fd;
   }
