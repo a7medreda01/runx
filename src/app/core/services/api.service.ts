@@ -6,6 +6,7 @@ import { LanguageService } from './language.service';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../Environment/environment';
 import { Project, ServiceItem } from '../models/project.model';
+import { INITIAL_SERVICES } from './data/initial-services.data';
 import { ApiResponse, PagedData, Company } from '../../Models/api.models';
 
 export interface CompanyInfo {
@@ -215,6 +216,7 @@ export class ApiService {
       technologies: technologies,
       featured: p.featured ?? true,
       year: new Date(p.executionDate || Date.now()).getFullYear().toString(),
+      executionDate: p.executionDate || undefined,
       keyFeatures: keyFeatures,
       metrics: metrics,
       challengeSolution: challengeSolution
@@ -277,22 +279,39 @@ export class ApiService {
         const paged = res.body?.data;
         const items = paged?.items || [];
 
-        const mappedServices: ServiceItem[] = items.map((s: any) => {
-          let features: string[] = s.description ? [s.description] : [];
+        let mappedServices: ServiceItem[] = (items && items.length > 0) ? items.map((s: any, idx: number) => {
+          const fallback = INITIAL_SERVICES[idx % INITIAL_SERVICES.length];
+          const title = (s.name && s.name.trim().length > 0) ? s.name : (fallback?.title || 'خدمة برمجية');
+          const description = (s.description && s.description.trim().length > 0) ? s.description : (fallback?.description || '');
+          const subtitle = (s.subtitle && s.subtitle.trim().length > 0) ? s.subtitle : (s.categoryName || fallback?.subtitle || 'خدمات رقمية متقدمة');
+
+          let features: string[] = [];
           if (s.featuresJson) {
-            try { features = JSON.parse(s.featuresJson); } catch {}
+            try {
+              const parsed = JSON.parse(s.featuresJson);
+              if (Array.isArray(parsed) && parsed.length > 0) features = parsed;
+            } catch {}
+          }
+          if (features.length === 0 && fallback?.features) {
+            features = fallback.features;
           }
 
-          let technologies: string[] = ['C#', '.NET 8', 'Angular'];
+          let technologies: string[] = [];
           if (s.technologiesJson) {
-            try { technologies = JSON.parse(s.technologiesJson); } catch {}
+            try {
+              const parsed = JSON.parse(s.technologiesJson);
+              if (Array.isArray(parsed) && parsed.length > 0) technologies = parsed;
+            } catch {}
+          }
+          if (technologies.length === 0 && fallback?.technologies) {
+            technologies = fallback.technologies;
           }
 
-          const rawImg = s.imageUrl;
+          const rawImg = s.imageUrl || fallback?.imageUrl;
           const imgUrl = this.normalizeUrl(rawImg);
 
-          let priceUsd: number | undefined = undefined;
-          let priceEgp: number | undefined = undefined;
+          let priceUsd: number | undefined = fallback?.priceUsd;
+          let priceEgp: number | undefined = fallback?.priceEgp;
           if (s.priceStart !== null && s.priceStart !== undefined && s.priceStart !== '') {
             const parsed = parseFloat(s.priceStart.toString().replace(/[^0-9.]/g, ''));
             if (!isNaN(parsed) && parsed > 0) {
@@ -302,20 +321,30 @@ export class ApiService {
           }
 
           return {
-            id: s.id ? s.id.toString() : 'srv-' + Math.random(),
-            title: s.name,
-            subtitle: s.subtitle || s.categoryName || 'خدمات رقمية',
-            icon: 'code',
-            bootstrapIcon: s.bootstrapIcon || 'bi-code-slash',
+            id: s.id ? s.id.toString() : (fallback?.id || 'srv-' + (idx + 1)),
+            title: title,
+            subtitle: subtitle,
+            icon: fallback?.icon || 'code',
+            bootstrapIcon: s.bootstrapIcon || fallback?.bootstrapIcon || 'bi-code-slash',
             imageUrl: imgUrl || undefined,
-            description: s.description || '',
+            description: description,
             features: features,
             technologies: technologies,
-            priceStart: (s.priceStart !== null && s.priceStart !== undefined && s.priceStart !== '') ? (s.priceStart.toString().includes('يبدأ من') ? s.priceStart.toString() : 'يبدأ من ' + s.priceStart + ' $') : 'حسب النطاق',
+            priceStart: (priceUsd ? 'يبدأ من ' + priceUsd + ' $' : (fallback?.priceStart || 'حسب النطاق')),
             priceUsd: priceUsd,
             priceEgp: priceEgp
           };
-        });
+        }) : [...INITIAL_SERVICES];
+
+        // If backend returned services with no valid titles or fewer items, supplement with INITIAL_SERVICES
+        if (mappedServices.length < INITIAL_SERVICES.length) {
+          const existingTitles = mappedServices.map(m => (m.title || '').toLowerCase());
+          for (const initSrv of INITIAL_SERVICES) {
+            if (!existingTitles.includes((initSrv.title || '').toLowerCase())) {
+              mappedServices.push(initSrv);
+            }
+          }
+        }
 
         this.lastApiResponse.set({
           endpoint: `${environment.apiBaseUrl}/services`,

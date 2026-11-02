@@ -1,4 +1,4 @@
-﻿import { Injectable, signal, computed, inject, effect } from '@angular/core';
+import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LanguageService } from './language.service';
 import { Project } from '../models/project.model';
@@ -32,8 +32,20 @@ export class ProjectsService {
     });
   });
 
+  public sortedProjects = computed(() => {
+    const list = [...this.projectsSignal()];
+    return list.sort((a, b) => {
+      const dateA = a.executionDate ? new Date(a.executionDate).getTime() : (a.year ? parseInt(a.year, 10) * 10000 : 0);
+      const dateB = b.executionDate ? new Date(b.executionDate).getTime() : (b.year ? parseInt(b.year, 10) * 10000 : 0);
+      if (dateB !== dateA) return dateB - dateA;
+      const numA = parseInt(a.id.toString().replace(/\D/g, '') || '0', 10);
+      const numB = parseInt(b.id.toString().replace(/\D/g, '') || '0', 10);
+      return numB - numA;
+    });
+  });
+
   public featuredProjects = computed(() => {
-    return this.projectsSignal().filter(p => p.featured);
+    return this.sortedProjects().filter(p => p.featured);
   });
 
   constructor() {

@@ -23,6 +23,7 @@ export interface Project {
   featured?: boolean;
   metrics?: ProjectMetric[];
   year?: string;
+  executionDate?: string;
   duration?: string;
   role?: string;
   keyFeatures?: string[];

@@ -129,7 +129,7 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-        @for (project of projectsService.featuredProjects(); track project.id) {
+        @for (project of homeProjects(); track project.id) {
           <div [routerLink]="['/projects', project.id]" class="runx-card overflow-hidden group cursor-pointer flex flex-col justify-between rounded-2xl sm:rounded-3xl border border-slate-200/90 hover:border-[#C1662F]/40 shadow-xs transition-all duration-300">
             <div>
               <div class="relative h-48 sm:h-52 bg-slate-100 overflow-hidden">
@@ -164,10 +164,47 @@
         }
       </div>
 
-      <div class="text-center mt-8 sm:mt-12">
-        <a routerLink="/projects" class="btn-runx-primary px-6 sm:px-8 py-3 sm:py-3.5 text-xs sm:text-base font-bold">
-          <span>{{ lang.currentLang() === 'ar' ? 'عرض جميع الأعمال والمشاريع' : 'Explore All Showcase Projects' }}</span>
-        </a>
+      <!-- Infinite Scroll Anchor -->
+      <div #projectsScrollAnchor class="h-4 w-full"></div>
+
+      <!-- Pagination & Load More Controls -->
+      <div class="flex flex-col items-center justify-center gap-4 mt-8 sm:mt-12">
+        @if (hasMoreProjects()) {
+          <button
+            type="button"
+            (click)="loadMore()"
+            [disabled]="isScrollLoading()"
+            class="inline-flex items-center gap-3 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-[#1E2A4A] to-[#0F172A] hover:from-[#C1662F] hover:to-[#9F481B] text-white font-bold text-sm sm:text-base shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-60 cursor-pointer"
+          >
+            @if (isScrollLoading()) {
+              <span class="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+              <span>{{ lang.currentLang() === 'ar' ? 'جاري تحميل المشاريع...' : 'Loading Projects...' }}</span>
+            } @else {
+              <i class="bi bi-arrow-clockwise text-lg"></i>
+              <span>{{ lang.currentLang() === 'ar' ? 'عرض المزيد من المشاريع' : 'Load More Projects' }}</span>
+              <span class="text-xs px-2.5 py-0.5 rounded-full bg-white/20 text-white font-mono">
+                {{ homeProjects().length }} / {{ totalProjects() }}
+              </span>
+            }
+          </button>
+          <span class="text-xs text-slate-400">
+            {{ lang.currentLang() === 'ar' ? 'أو قم بالتمرير للأسفل للتحميل التلقائي' : 'Or scroll down to load automatically' }}
+          </span>
+        } @else if (totalProjects() > 0) {
+          <div class="text-center py-2">
+            <span class="text-xs sm:text-sm text-slate-500 font-medium">
+              <i class="bi bi-check2-all text-[#C1662F] ml-1"></i>
+              {{ lang.currentLang() === 'ar' ? 'تم عرض كافة المشاريع المنفذة بالكامل (' + totalProjects() + ' مشروع)' : 'All ' + totalProjects() + ' projects loaded' }}
+            </span>
+          </div>
+        }
+
+        <div class="pt-2">
+          <a routerLink="/projects" class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#C1662F] hover:text-[#9F481B] transition-colors">
+            <span>{{ lang.currentLang() === 'ar' ? 'الانتقال لصفحة المشاريع الكاملة مع البحث والتصنيف' : 'Go to Full Projects Showcase' }}</span>
+            <i class="bi" [class.bi-arrow-left]="lang.dir() === 'rtl'" [class.bi-arrow-right]="lang.dir() === 'ltr'"></i>
+          </a>
+        </div>
       </div>
     </div>
   </section>
