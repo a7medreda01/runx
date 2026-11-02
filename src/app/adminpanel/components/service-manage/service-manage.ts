@@ -35,6 +35,7 @@ export class ServiceManageComponent implements OnInit {
   subtitle = '';
   categoryId: number | null = null;
   priceStart: number | null = null;
+  priceStartEgp: number | null = null;
   bootstrapIcon = 'bi-code-slash';
   description = '';
   
@@ -151,12 +152,38 @@ export class ServiceManageComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
+  onUsdChange(): void {
+    if (this.priceStart !== null && this.priceStart !== undefined && this.priceStart > 0) {
+      this.priceStartEgp = Math.round(this.priceStart * 50);
+    } else {
+      this.priceStartEgp = null;
+    }
+    this.cdr.markForCheck();
+  }
+
+  onEgpChange(): void {
+    if (this.priceStartEgp !== null && this.priceStartEgp !== undefined && this.priceStartEgp > 0) {
+      this.priceStart = Math.round(this.priceStartEgp / 50);
+    } else {
+      this.priceStart = null;
+    }
+    this.cdr.markForCheck();
+  }
+
+  getPriceEgp(usdStr?: string | number): string {
+    if (!usdStr) return '0';
+    const num = parseFloat(usdStr.toString().replace(/[^0-9.]/g, ''));
+    if (isNaN(num)) return '0';
+    return (num * 50).toLocaleString('en-US');
+  }
+
   openAddForm(): void {
     this.editingId = null;
     this.name = '';
     this.subtitle = '';
     this.categoryId = this.categories.length > 0 ? this.categories[0].id : null;
     this.priceStart = null;
+    this.priceStartEgp = null;
     this.bootstrapIcon = 'bi-code-slash';
     this.description = '';
     this.featuresList = [''];
@@ -177,6 +204,7 @@ export class ServiceManageComponent implements OnInit {
     this.subtitle = svc.subtitle || '';
     this.categoryId = svc.serviceCategoryId;
     this.priceStart = svc.priceStart ? Number(svc.priceStart) : null;
+    this.priceStartEgp = this.priceStart ? Math.round(this.priceStart * 50) : null;
     this.bootstrapIcon = svc.bootstrapIcon || 'bi-code-slash';
     this.description = svc.description || '';
 

@@ -772,3 +772,39 @@
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
 }
+
+/* Dual Currency Starting Price */
+.price-display-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.price-badge-egp {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #b45309;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.pricing-dual-card {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.currency-hint {
+  font-size: 0.75rem;
+  color: #64748B;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}

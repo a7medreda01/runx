@@ -50,9 +50,10 @@
             <span class="badge category-badge">{{ svc.categoryName || 'بدون تصنيف' }}</span>
           </td>
           <td>
-            <span class="price-badge" *ngIf="svc.priceStart">
-              يبدأ من {{ svc.priceStart }} $
-            </span>
+            <div *ngIf="svc.priceStart" class="price-display-col">
+              <span class="price-badge">يبدأ من {{ svc.priceStart }} $</span>
+              <span class="price-badge-egp">يعادل {{ getPriceEgp(svc.priceStart) }} ج.م</span>
+            </div>
             <span class="text-slate-500 text-xs" *ngIf="!svc.priceStart">حسب النطاق</span>
           </td>
           <td>
@@ -103,7 +104,7 @@
             </div>
           </div>
 
-          <!-- Category & Price -->
+          <!-- Category & Dual Pricing -->
           <div class="two-col-grid">
             <div class="form-group">
               <label for="svcCategory">تصنيف الخدمة *</label>
@@ -113,9 +114,20 @@
               </select>
             </div>
 
-            <div class="form-group">
-              <label for="svcPrice">السعر المبدئي ($ دولار)</label>
-              <input type="number" id="svcPrice" [(ngModel)]="priceStart" name="priceStart" placeholder="مثال: 1200 (اتركه فارغاً إذا كان حسب النطاق)" />
+            <div class="pricing-dual-card">
+              <div class="two-col-grid">
+                <div class="form-group">
+                  <label for="svcPrice">السعر المبدئي ($ دولار)</label>
+                  <input type="number" id="svcPrice" [(ngModel)]="priceStart" (ngModelChange)="onUsdChange()" name="priceStart" placeholder="مثال: 1000" />
+                </div>
+                <div class="form-group">
+                  <label for="svcPriceEgp">السعر بالجنيه (ج.م)</label>
+                  <input type="number" id="svcPriceEgp" [(ngModel)]="priceStartEgp" (ngModelChange)="onEgpChange()" name="priceStartEgp" placeholder="مثال: 50000" />
+                </div>
+              </div>
+              <div class="currency-hint">
+                <i class="bi bi-info-circle"></i> يتم التحويل تلقائياً (1 $ ≈ 50 ج.م). يعرض الموقع السعر بالجنيه لزوار مصر وبالدولار للزوار الدوليين.
+              </div>
             </div>
           </div>
 
