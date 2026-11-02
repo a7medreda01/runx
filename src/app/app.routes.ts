@@ -31,6 +31,16 @@ export const routes: Routes = [
     loadComponent: () => import('./adminpanel/login/login.component').then(m => m.AdminLoginComponent)
   },
   {
+    path: 'admin/projects/new',
+    loadComponent: () => import('./adminpanel/components/project-edit/project-edit.component').then(m => m.ProjectEditComponent),
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/projects/edit/:id',
+    loadComponent: () => import('./adminpanel/components/project-edit/project-edit.component').then(m => m.ProjectEditComponent),
+    canActivate: [adminGuard]
+  },
+  {
     path: 'admin',
     loadComponent: () => import('./adminpanel/panel/panel.component').then(m => m.AdminPanelComponent),
     canActivate: [adminGuard]

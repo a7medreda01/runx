@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AdminAuthService } from '../admin-auth.service';
 
 // Services for dashboard statistics
@@ -60,10 +60,17 @@ export class AdminPanelComponent implements OnInit {
     private packageSvc: PackageService,
     private categorySvc: ServiceCategoryService,
     private companySvc: CompanyService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      if (params['tab']) {
+        this.activeTab.set(params['tab']);
+        this.cdr.markForCheck();
+      }
+    });
     this.loadStats();
   }
 

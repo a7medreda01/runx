@@ -1,0 +1,592 @@
+<div class="project-edit-page animate-fade-in" dir="rtl">
+  <!-- Top Navigation Bar -->
+  <header class="edit-header">
+    <div class="header-left">
+      <button type="button" (click)="goBack()" class="btn-back">
+        <i class="bi bi-arrow-right"></i>
+        <span>العودة للمشاريع</span>
+      </button>
+      <div class="title-meta">
+        <h2>{{ isNew ? 'إضافة مشروع جديد' : 'تعديل مشروع: ' + (name || 'بدون اسم') }}</h2>
+        <div class="meta-badges">
+          <span class="badge category-badge" *ngIf="serviceCategoryId">
+            <i class="bi bi-tag-fill"></i>
+            {{ getCategoryName(serviceCategoryId) || 'تصنيف' }}
+          </span>
+          <span class="badge featured-badge" *ngIf="featured">
+            <i class="bi bi-star-fill"></i> مميز في الرئيسية
+          </span>
+          <span class="badge id-badge" *ngIf="projectId">ID: #{{ projectId }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <a *ngIf="projectId" [routerLink]="['/projects', projectId]" target="_blank" class="btn-preview" title="معاينة في الموقع">
+        <i class="bi bi-box-arrow-up-left"></i>
+        <span>معاينة في الموقع</span>
+      </a>
+      <button type="button" (click)="goBack()" class="btn-secondary">
+        إلغاء
+      </button>
+      <button type="button" (click)="onSubmit()" [disabled]="isSaving || isLoading" class="btn-save-primary">
+        <span *ngIf="!isSaving">
+          <i class="bi bi-check2-circle"></i> حفظ التغييرات
+        </span>
+        <span *ngIf="isSaving" class="btn-loading">
+          <span class="spinner-sm"></span> جاري الحفظ...
+        </span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Alerts -->
+  <div class="alerts-container">
+    <div *ngIf="successMessage" class="alert alert-success animate-fade-in">
+      <div class="alert-content">
+        <i class="bi bi-check-circle-fill"></i>
+        <span>{{ successMessage }}</span>
+      </div>
+      <button type="button" class="alert-close" (click)="successMessage = ''">&times;</button>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-error animate-fade-in">
+      <div class="alert-content">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+      <button type="button" class="alert-close" (click)="errorMessage = ''">&times;</button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner-lg"></div>
+    <p>جاري تحميل بيانات المشروع بالكامل...</p>
+  </div>
+
+  <!-- Form Content -->
+  <form *ngIf="!isLoading" (ngSubmit)="onSubmit()" class="edit-form-layout">
+    <div class="form-grid">
+
+      <!-- Column 1: Main Details -->
+      <div class="grid-main">
+
+        <!-- Card: Basic Information -->
+        <section class="form-card">
+          <div class="card-title">
+            <i class="bi bi-info-circle-fill icon-purple"></i>
+            <div>
+              <h3>المعلومات الأساسية والتصنيف</h3>
+              <p>بيانات تعريف المشروع والجهة المستفيدة وتصنيف الخدمة</p>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="input-row">
+              <div class="form-group flex-2">
+                <label for="projName">اسم المشروع <span class="required">*</span></label>
+                <div class="input-wrap">
+                  <i class="bi bi-briefcase leading-icon"></i>
+                  <input
+                    type="text"
+                    id="projName"
+                    name="name"
+                    [(ngModel)]="name"
+                    required
+                    placeholder="مثال: منصة ريزورت جي لإدارة المنتجعات"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group flex-1">
+                <label for="projCat">تصنيف الخدمة <span class="required">*</span></label>
+                <div class="input-wrap">
+                  <i class="bi bi-folder leading-icon"></i>
+                  <select id="projCat" name="serviceCategoryId" [(ngModel)]="serviceCategoryId" required>
+                    <option [ngValue]="null" disabled>-- اختر التصنيف --</option>
+                    <option *ngFor="let cat of categories" [ngValue]="cat.id">
+                      {{ cat.name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="input-row">
+              <div class="form-group flex-1">
+                <label for="projClient">العميل / المؤسسة</label>
+                <div class="input-wrap">
+                  <i class="bi bi-building leading-icon"></i>
+                  <input
+                    type="text"
+                    id="projClient"
+                    name="client"
+                    [(ngModel)]="client"
+                    placeholder="مثال: مجموعة ريزورت جي الفندقية"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group flex-1">
+                <label for="projDuration">مدة التنفيذ</label>
+                <div class="input-wrap">
+                  <i class="bi bi-clock-history leading-icon"></i>
+                  <input
+                    type="text"
+                    id="projDuration"
+                    name="duration"
+                    [(ngModel)]="duration"
+                    placeholder="مثال: 3 أشهر، 8 أسابيع"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group flex-1">
+                <label for="projDate">تاريخ التنفيذ <span class="required">*</span></label>
+                <div class="input-wrap">
+                  <i class="bi bi-calendar-event leading-icon"></i>
+                  <input
+                    type="date"
+                    id="projDate"
+                    name="executionDate"
+                    [(ngModel)]="executionDate"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="input-row">
+              <div class="form-group flex-2">
+                <label for="projRole">دورنا ومسؤولية الفريق في المشروع</label>
+                <div class="input-wrap">
+                  <i class="bi bi-person-workspace leading-icon"></i>
+                  <input
+                    type="text"
+                    id="projRole"
+                    name="role"
+                    [(ngModel)]="role"
+                    placeholder="مثال: دراسة، تصميم واجهات UI/UX، وبرمجة كاملة Full-Stack"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group flex-2">
+                <label for="projLiveUrl">رابط المشروع الحي (Live URL)</label>
+                <div class="input-wrap">
+                  <i class="bi bi-globe leading-icon"></i>
+                  <input
+                    type="url"
+                    id="projLiveUrl"
+                    name="liveUrl"
+                    [(ngModel)]="liveUrl"
+                    placeholder="https://example.com"
+                    dir="ltr"
+                  />
+                  <a *ngIf="liveUrl" [href]="liveUrl" target="_blank" class="input-suffix-btn" title="فتح الرابط">
+                    <i class="bi bi-box-arrow-up-right"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="switch-row">
+              <label class="switch-container">
+                <input type="checkbox" name="featured" [(ngModel)]="featured" />
+                <span class="switch-slider"></span>
+              </label>
+              <div class="switch-label">
+                <strong>مشروع مميز في الصفحة الرئيسية (Featured Project)</strong>
+                <p>يظهر هذا المشروع في قسم أحدث وأبرز الأعمال على الصفحة الرئيسية للموقع</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Card: Project Description -->
+        <section class="form-card">
+          <div class="card-title">
+            <i class="bi bi-file-text-fill icon-purple"></i>
+            <div>
+              <h3>وصف المشروع والنبذة التعريفية</h3>
+              <p>شرح فكرة المشروع والأهداف والقيمة التي تم تقديمها</p>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="form-group">
+              <label for="projDesc">الوصف التفصيلي</label>
+              <textarea
+                id="projDesc"
+                name="description"
+                [(ngModel)]="description"
+                rows="6"
+                placeholder="اكتب وصفاً جذاباً وشاملاً عن المشروع، متطلبات العميل، ونطاق العمل المنجز..."
+              ></textarea>
+              <span class="char-count">{{ description ? description.length : 0 }} حرف</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Card: Challenges & Solutions (المطلوبة بالاسم!) -->
+        <section class="form-card highlight-card">
+          <div class="card-title flex-between">
+            <div class="d-flex align-center gap-12">
+              <i class="bi bi-shield-shaded icon-gradient"></i>
+              <div>
+                <h3>التحديات والحلول التقنية (Challenges & Solutions)</h3>
+                <p>التحديات البرمجية والتصميمية التي واجهت العميل وكيف قمنا بحلها هندسياً</p>
+              </div>
+            </div>
+            <button type="button" (click)="addChallenge()" class="btn-add-item">
+              <i class="bi bi-plus-lg"></i> إضافة تحدي وحل
+            </button>
+          </div>
+
+          <div class="card-body">
+            <div *ngIf="challenges.length === 0" class="empty-items-state">
+              <p>لم يتم تسجيل أي تحديات لهذا المشروع حتى الآن.</p>
+              <button type="button" (click)="addChallenge()" class="btn-outline-sm">
+                + إضافة أول تحدي
+              </button>
+            </div>
+
+            <div class="challenge-items-list" *ngIf="challenges.length > 0">
+              <div
+                class="challenge-card animate-fade-in"
+                *ngFor="let item of challenges; let i = index; trackBy: trackByIndex"
+              >
+                <div class="challenge-header">
+                  <span class="challenge-index">
+                    <i class="bi bi-puzzle"></i> التحدي رقم {{ i + 1 }}
+                  </span>
+                  <button
+                    type="button"
+                    (click)="removeChallenge(i)"
+                    class="btn-remove-item"
+                    title="حذف هذا التحدي"
+                  >
+                    <i class="bi bi-trash3"></i> حذف
+                  </button>
+                </div>
+
+                <div class="challenge-grid">
+                  <div class="form-group">
+                    <label>
+                      <i class="bi bi-exclamation-triangle text-amber"></i> التحدي الذي واجه العميل
+                    </label>
+                    <textarea
+                      name="challenge_{{ i }}"
+                      [(ngModel)]="item.challenge"
+                      rows="3"
+                      placeholder="مثال: صعوبة إدارة الحجوزات المتزامنة وتفادي التعارض في الغرف بين الفروع المختلفة..."
+                    ></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label>
+                      <i class="bi bi-check2-circle text-emerald"></i> الحل التقني المنفذ
+                    </label>
+                    <textarea
+                      name="solution_{{ i }}"
+                      [(ngModel)]="item.solution"
+                      rows="3"
+                      placeholder="مثال: بناء محرك حجز آني (Real-Time) باستخدام خوارزميات القفل الموزع وقواعد بيانات سريعة..."
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Card: Key Features -->
+        <section class="form-card">
+          <div class="card-title flex-between">
+            <div class="d-flex align-center gap-12">
+              <i class="bi bi-stars icon-purple"></i>
+              <div>
+                <h3>الميزات والخصائص الرئيسية (Key Features)</h3>
+                <p>أهم المميزات الملموسة التي يحتوي عليها المشروع</p>
+              </div>
+            </div>
+            <button type="button" (click)="addFeature()" class="btn-add-item">
+              <i class="bi bi-plus-lg"></i> إضافة ميزة
+            </button>
+          </div>
+
+          <div class="card-body">
+            <div class="features-list">
+              <div
+                class="feature-row animate-fade-in"
+                *ngFor="let feat of keyFeatures; let i = index; trackBy: trackByIndex"
+              >
+                <span class="feature-num">{{ i + 1 }}</span>
+                <div class="input-wrap flex-1">
+                  <input
+                    type="text"
+                    name="feature_{{ i }}"
+                    [(ngModel)]="keyFeatures[i]"
+                    placeholder="مثال: نظام دفع إلكتروني يدعم أبل باي والبطاقات البنكية الدولية والمحلية"
+                  />
+                </div>
+                <button
+                  type="button"
+                  (click)="removeFeature(i)"
+                  class="btn-icon-danger"
+                  title="حذف"
+                >
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Card: Metrics & KPIs -->
+        <section class="form-card">
+          <div class="card-title flex-between">
+            <div class="d-flex align-center gap-12">
+              <i class="bi bi-graph-up-arrow icon-purple"></i>
+              <div>
+                <h3>الأرقام والنتائج القياسية (Metrics & Key Results)</h3>
+                <p>مؤشرات النجاح والأرقام المحققة بعد إطلاق المشروع</p>
+              </div>
+            </div>
+            <button type="button" (click)="addMetric()" class="btn-add-item">
+              <i class="bi bi-plus-lg"></i> إضافة مؤشر
+            </button>
+          </div>
+
+          <div class="card-body">
+            <div class="metrics-list">
+              <div
+                class="metric-row animate-fade-in"
+                *ngFor="let m of metrics; let i = index; trackBy: trackByIndex"
+              >
+                <div class="form-group flex-2">
+                  <label>عنوان المؤشر / النتيجة</label>
+                  <input
+                    type="text"
+                    name="metric_label_{{ i }}"
+                    [(ngModel)]="m.label"
+                    placeholder="مثال: زيادة معدل التحويل والمبيعات"
+                  />
+                </div>
+                <div class="form-group flex-1">
+                  <label>القيمة / النسبة</label>
+                  <input
+                    type="text"
+                    name="metric_val_{{ i }}"
+                    [(ngModel)]="m.value"
+                    placeholder="مثال: +185%"
+                    dir="ltr"
+                  />
+                </div>
+                <button
+                  type="button"
+                  (click)="removeMetric(i)"
+                  class="btn-icon-danger self-end"
+                  title="حذف المؤشر"
+                >
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Column 2: Side Cards (Cover Image, Techs, Gallery) -->
+      <div class="grid-side">
+
+        <!-- Card: Cover Image -->
+        <section class="form-card">
+          <div class="card-title">
+            <i class="bi bi-image-fill icon-purple"></i>
+            <div>
+              <h3>صورة الغلاف الرئيسية</h3>
+              <p>الصورة الأساسية المعروضة في البطاقات والمعرض</p>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="cover-preview-box">
+              <img
+                *ngIf="coverPreviewUrl || coverImageUrl"
+                [src]="coverPreviewUrl || coverImageUrl"
+                alt="Cover Preview"
+                class="cover-img"
+              />
+              <div *ngIf="!coverPreviewUrl && !coverImageUrl" class="no-cover-placeholder">
+                <i class="bi bi-card-image"></i>
+                <span>لم يتم تحديد صورة غلاف بعد</span>
+              </div>
+            </div>
+
+            <div class="cover-actions">
+              <label class="btn-upload-cover">
+                <i class="bi bi-cloud-arrow-up-fill"></i>
+                <span>{{ (coverPreviewUrl || coverImageUrl) ? 'تغيير صورة الغلاف' : 'رفع صورة غلاف' }}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  (change)="onCoverSelected($event)"
+                  style="display: none;"
+                />
+              </label>
+              <button
+                *ngIf="coverPreviewUrl || coverImageUrl"
+                type="button"
+                (click)="removeCover()"
+                class="btn-remove-cover"
+                title="إزالة الغلاف"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+            <p class="hint-text">يُفضل استخدام أبعاد 16:9 وبدقة عالية (PNG أو JPG أو WebP)</p>
+          </div>
+        </section>
+
+        <!-- Card: Technologies -->
+        <section class="form-card">
+          <div class="card-title">
+            <i class="bi bi-cpu-fill icon-purple"></i>
+            <div>
+              <h3>التقنيات المستخدمة</h3>
+              <p>لغات البرمجة، أطر العمل، وقواعد البيانات</p>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <!-- Selected Tech Badges -->
+            <div class="tech-tags-cloud">
+              <span class="tech-tag" *ngFor="let t of technologies; let i = index">
+                <span>{{ t }}</span>
+                <button type="button" (click)="removeTechnology(i)" title="إزالة">&times;</button>
+              </span>
+              <span *ngIf="technologies.length === 0" class="no-tech-hint">
+                لم تتم إضافة أي تقنيات بعد
+              </span>
+            </div>
+
+            <!-- Tech Input -->
+            <div class="tech-input-group">
+              <input
+                type="text"
+                [(ngModel)]="newTechInput"
+                name="newTechInput"
+                placeholder="اكتب اسم التقنية واضغط Enter..."
+                (keydown)="onTechKeydown($event)"
+              />
+              <button type="button" (click)="addTechnology()" class="btn-add-tech">
+                <i class="bi bi-plus-lg"></i> إضافة
+              </button>
+            </div>
+
+            <!-- Suggestions -->
+            <div class="tech-suggestions">
+              <span class="suggestions-title">اقتراحات سريعة:</span>
+              <div class="suggestions-chips">
+                <button
+                  type="button"
+                  *ngFor="let sug of commonTechSuggestions"
+                  (click)="addTechnology(sug)"
+                  [disabled]="technologies.includes(sug)"
+                  class="chip-suggestion"
+                >
+                  + {{ sug }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Card: Gallery Sub-Images -->
+        <section class="form-card">
+          <div class="card-title flex-between">
+            <div class="d-flex align-center gap-12">
+              <i class="bi bi-images icon-purple"></i>
+              <div>
+                <h3>معرض الصور والشاشات الملحقة</h3>
+                <p>لقطات الشاشة للتطبيقات والمواقع ({{ gallery.length }} صور)</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <!-- Upload Button -->
+            <div class="gallery-upload-box">
+              <label class="gallery-dropzone" [class.disabled]="isUploadingGallery">
+                <i class="bi bi-cloud-arrow-up"></i>
+                <div class="dropzone-text">
+                  <strong *ngIf="!isUploadingGallery">اختر صوراً لإضافتها إلى المعرض</strong>
+                  <strong *ngIf="isUploadingGallery">جاري رفع الصور إلى السيرفر...</strong>
+                  <span>يمكنك اختيار عدة صور دفعة واحدة</span>
+                </div>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  (change)="onGallerySelected($event)"
+                  [disabled]="isUploadingGallery"
+                  style="display: none;"
+                />
+              </label>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div class="gallery-grid" *ngIf="gallery.length > 0">
+              <div class="gallery-thumb-item" *ngFor="let img of gallery">
+                <img [src]="img.imageUrl" alt="Gallery preview" />
+                <button
+                  type="button"
+                  class="btn-delete-thumb"
+                  (click)="deleteGalleryImage(img.id)"
+                  title="حذف الصورة"
+                >
+                  <i class="bi bi-trash3-fill"></i>
+                </button>
+              </div>
+            </div>
+
+            <p *ngIf="gallery.length === 0" class="no-gallery-hint">
+              لا توجد صور ملحقة في معرض هذا المشروع بعد.
+            </p>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+    <!-- Bottom Sticky Save Bar -->
+    <div class="bottom-actions-bar">
+      <div class="save-status">
+        <span *ngIf="successMessage" class="text-success">
+          <i class="bi bi-check-circle-fill"></i> {{ successMessage }}
+        </span>
+        <span *ngIf="errorMessage" class="text-danger">
+          <i class="bi bi-exclamation-triangle-fill"></i> {{ errorMessage }}
+        </span>
+      </div>
+
+      <div class="save-buttons">
+        <button type="button" (click)="goBack()" class="btn-cancel">
+          إلغاء والعودة
+        </button>
+        <button type="submit" [disabled]="isSaving || isLoading" class="btn-submit-save">
+          <span *ngIf="!isSaving">
+            <i class="bi bi-cloud-check-fill"></i> حفظ التعديلات بالكامل
+          </span>
+          <span *ngIf="isSaving" class="btn-loading">
+            <span class="spinner-sm"></span> جاري الحفظ...
+          </span>
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

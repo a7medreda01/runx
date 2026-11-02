@@ -96,11 +96,12 @@ export class ApiService {
 
   private normalizeUrl(url: string | null): string {
     if (!url) return '';
-    if (url.startsWith('https://localhost:7233')) {
-      return url.replace('https://localhost:7233', 'http://localhost:5244');
+    const baseHost = environment.apiBaseUrl.replace('/api', '');
+    if (url.startsWith('https://localhost:7233') || url.startsWith('http://localhost:5244')) {
+      return url.replace(/https?:\/\/localhost:\d+/, baseHost);
     }
     if (url.startsWith('/')) {
-      return `http://localhost:5244${url}`;
+      return `${baseHost}${url}`;
     }
     return url;
   }
