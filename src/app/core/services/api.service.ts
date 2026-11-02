@@ -1,13 +1,19 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of, throwError, forkJoin } from 'rxjs';
 import { HttpHeaders } from '@angular/common/http';
 import { LanguageService } from './language.service';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../Environment/environment';
 import { Project, ServiceItem } from '../models/project.model';
 import { INITIAL_SERVICES } from './data/initial-services.data';
-import { ApiResponse, PagedData, Company } from '../../Models/api.models';
+import { ApiResponse, PagedData, Company, ContactInfo, SocialMedia } from '../../Models/api.models';
+
+export interface SocialLink {
+  id?: number;
+  platform: string;
+  url: string;
+}
 
 export interface CompanyInfo {
   companyName: string;
@@ -15,13 +21,16 @@ export interface CompanyInfo {
   location: string;
   email: string;
   phone: string;
+  whatsApp: string;
   workingHours: string;
+  googleMapUrl?: string;
   stats: {
     completedProjects: number;
     satisfiedClients: number;
     yearsOfExperience: number;
     uptimeGuarantee: string;
   };
+  socialLinks: SocialLink[];
   apiMeta: {
     version: string;
     status: string;
@@ -109,43 +118,64 @@ export class ApiService {
 
   public loadCompanyInfo(): Observable<CompanyInfo | null> {
     const startTime = performance.now();
-    return this.http.get<ApiResponse<Company[]>>(`${environment.apiBaseUrl}/Company`, { observe: 'response' }).pipe(
-      map(res => {
+    return forkJoin({
+      company: this.http.get<ApiResponse<Company[]>>(`${environment.apiBaseUrl}/Company`).pipe(catchError(() => of(null))),
+      contact: this.http.get<ApiResponse<PagedData<ContactInfo>>>(`${environment.apiBaseUrl}/ContactInfo`).pipe(catchError(() => of(null))),
+      social: this.http.get<ApiResponse<PagedData<SocialMedia>>>(`${environment.apiBaseUrl}/SocialMedia?pageSize=50`).pipe(catchError(() => of(null)))
+    }).pipe(
+      map(results => {
         const endTime = performance.now();
-        const apiData = res.body?.data;
-        let info: CompanyInfo | null = null;
-        if (apiData && apiData.length > 0) {
-          const comp = apiData[0];
-          info = {
-            companyName: comp.name || 'RunX Tech',
-            tagline: comp.vision || 'حلول رقمية برمجية متكاملة',
-            location: comp.contactInfo?.address || 'الرياض، المملكة العربية السعودية',
-            email: comp.contactInfo?.email || 'info@runxtech.com',
-            phone: comp.contactInfo?.phone || '+966500000000',
-            workingHours: 'الأحد - الخميس (9:00 ص - 6:00 م)',
-            stats: {
-              completedProjects: (comp as any).completedProjects || 100,
-              satisfiedClients: (comp as any).satisfiedClients || 99,
-              yearsOfExperience: comp.yearsOfExperience || 12,
-              uptimeGuarantee: (comp as any).uptimeGuarantee || '99.9%'
-            },
-            apiMeta: {
-              version: 'v1.0.0',
-              status: '200 OK (LIVE_BACKEND)',
-              environment: 'Development',
-              serverRegion: 'ASP.NET Core Server'
-            }
-          };
-          this.companyInfo.set(info);
-        }
+        const comp = results.company?.data?.[0];
+        const contact = results.contact?.data?.items?.[0] || comp?.contactInfo;
+        const socialList = results.social?.data?.items || comp?.socialMediaLinks || [];
+
+        const phone = (contact?.phone && contact.phone.trim()) || '201148472670';
+        const whatsApp = (contact?.whatsApp && contact.whatsApp.trim()) || phone;
+        const email = (contact?.email && contact.email.trim()) || 'info@runxtech.com';
+        const address = (contact?.address && contact.address.trim()) || 'الرياض، المملكة العربية السعودية - حي الملقا';
+        const mapUrl = contact?.googleMapUrl || 'https://maps.google.com/?q=24.7136,46.6753';
+
+        const socialLinks: SocialLink[] = socialList.map((s: any) => ({
+          id: s.id,
+          platform: s.platform,
+          url: s.url
+        }));
+
+        const info: CompanyInfo = {
+          companyName: comp?.name || 'RunX Tech',
+          tagline: comp?.vision || 'حلول رقمية برمجية متكاملة',
+          location: address,
+          email: email,
+          phone: phone,
+          whatsApp: whatsApp,
+          workingHours: 'الأحد - الخميس (9:00 ص - 6:00 م)',
+          googleMapUrl: mapUrl,
+          stats: {
+            completedProjects: (comp as any)?.completedProjects || 100,
+            satisfiedClients: (comp as any)?.satisfiedClients || 99,
+            yearsOfExperience: comp?.yearsOfExperience || 12,
+            uptimeGuarantee: (comp as any)?.uptimeGuarantee || '99.9%'
+          },
+          socialLinks: socialLinks,
+          apiMeta: {
+            version: 'v1.0.0',
+            status: '200 OK (LIVE_BACKEND)',
+            environment: 'Production',
+            serverRegion: 'ASP.NET Core Server'
+          }
+        };
+
+        this.companyInfo.set(info);
+
         this.lastApiResponse.set({
           endpoint: `${environment.apiBaseUrl}/Company`,
-          statusCode: res.status || 200,
-          statusText: res.statusText || 'OK',
+          statusCode: 200,
+          statusText: 'OK',
           timestamp: new Date().toISOString(),
           responseTimeMs: Math.round(endTime - startTime),
-          data: apiData
+          data: info
         });
+
         return info;
       }),
       catchError(err => {

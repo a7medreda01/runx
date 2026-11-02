@@ -20,7 +20,7 @@
           </div>
           <div>
             <span class="text-slate-400 block text-xs">{{ lang.t()['contact_address_label'] }}</span>
-            <span class="font-bold">{{ lang.currentLang() === 'ar' ? 'الرياض، المملكة العربية السعودية - حي الملقا' : 'Riyadh, Kingdom of Saudi Arabia - Al Malqa District' }}</span>
+            <span class="font-bold">{{ api.companyInfo()?.location || (lang.currentLang() === 'ar' ? 'الرياض، المملكة العربية السعودية - حي الملقا' : 'Riyadh, Kingdom of Saudi Arabia - Al Malqa District') }}</span>
           </div>
         </div>
 
@@ -30,7 +30,9 @@
           </div>
           <div>
             <span class="text-slate-400 block text-xs">{{ lang.t()['contact_email_label'] }}</span>
-            <a href="mailto:info@runxtech.com" class="font-bold hover:text-[#C1662F] dir-ltr inline-block">info@runxtech.com</a>
+            <a [href]="'mailto:' + (api.companyInfo()?.email || 'info@runxtech.com')" class="font-bold hover:text-[#C1662F] dir-ltr inline-block">
+              {{ api.companyInfo()?.email || 'info@runxtech.com' }}
+            </a>
           </div>
         </div>
 
@@ -40,7 +42,9 @@
           </div>
           <div>
             <span class="text-slate-400 block text-xs">{{ lang.t()['contact_phone_label'] }}</span>
-            <a href="https://wa.me/966500000000" target="_blank" class="font-bold hover:text-[#C1662F] dir-ltr inline-block">+966 50 000 0000</a>
+            <a [href]="'https://wa.me/' + (api.companyInfo()?.whatsApp || api.companyInfo()?.phone || '201148472670')" target="_blank" class="font-bold hover:text-[#C1662F] dir-ltr inline-block font-mono">
+              {{ formatPhone(api.companyInfo()?.phone || '201148472670') }}
+            </a>
           </div>
         </div>
 
@@ -50,9 +54,23 @@
           </div>
           <div>
             <span class="text-slate-400 block text-xs">{{ lang.t()['contact_hours_label'] }}</span>
-            <span class="font-bold">{{ lang.currentLang() === 'ar' ? 'الأحد - الخميس (9:00 ص - 6:00 م)' : 'Sunday - Thursday (9:00 AM - 6:00 PM)' }}</span>
+            <span class="font-bold">{{ api.companyInfo()?.workingHours || (lang.currentLang() === 'ar' ? 'الأحد - الخميس (9:00 ص - 6:00 م)' : 'Sunday - Thursday (9:00 AM - 6:00 PM)') }}</span>
           </div>
         </div>
+
+        <!-- Social Media Links -->
+        @if (api.companyInfo()?.socialLinks && (api.companyInfo()?.socialLinks)!.length > 0) {
+          <div class="pt-4 border-t border-white/10 space-y-2">
+            <span class="text-slate-400 block text-xs font-semibold">{{ lang.currentLang() === 'ar' ? 'تابعنا على منصات التواصل:' : 'Connect on Social Media:' }}</span>
+            <div class="flex items-center gap-2.5">
+              @for (social of (api.companyInfo()?.socialLinks)!; track social.id || social.platform) {
+                <a [href]="social.url" target="_blank" [title]="social.platform" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-[#C1662F] text-white flex items-center justify-center transition-all duration-200 shadow-sm">
+                  <i class="bi" [ngClass]="getSocialIcon(social.platform)"></i>
+                </a>
+              }
+            </div>
+          </div>
+        }
       </div>
     </div>
 

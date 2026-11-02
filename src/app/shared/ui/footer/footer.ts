@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LanguageService } from '../../../core/services/language.service';
+import { ApiService } from '../../../core/services/api.service';
 
 @Component({
   selector: 'app-footer',
@@ -20,7 +21,7 @@ import { LanguageService } from '../../../core/services/language.service';
               </div>
               <div class="flex flex-col">
                 <span class="font-display text-2xl font-bold text-white tracking-wide">
-                  Runx Tech
+                  {{ api.companyInfo()?.companyName || 'Runx Tech' }}
                 </span>
                 <span class="text-[10px] text-slate-400 font-mono tracking-wider">
                   SOLUTIONS & TECH
@@ -29,7 +30,7 @@ import { LanguageService } from '../../../core/services/language.service';
             </a>
 
             <p class="subtext-card text-slate-300 max-w-md">
-              {{ lang.t()['footer_tagline'] }}
+              {{ api.companyInfo()?.tagline || lang.t()['footer_tagline'] }}
             </p>
 
             <div class="flex items-center gap-3 pt-2">
@@ -38,6 +39,17 @@ import { LanguageService } from '../../../core/services/language.service';
                 <span>{{ lang.currentLang() === 'ar' ? 'متاحون للمشاريع الجديدة 2026' : 'Available for New Projects 2026' }}</span>
               </span>
             </div>
+
+            <!-- Social Media Icons in Brand Column -->
+            @if (api.companyInfo()?.socialLinks && (api.companyInfo()?.socialLinks)!.length > 0) {
+              <div class="flex items-center gap-2 pt-2">
+                @for (social of (api.companyInfo()?.socialLinks)!; track social.id || social.platform) {
+                  <a [href]="social.url" target="_blank" [title]="social.platform" class="w-9 h-9 rounded-xl bg-slate-800/90 border border-slate-700/80 text-slate-300 hover:text-white hover:bg-[#C1662F] hover:border-[#C1662F] flex items-center justify-center transition-all duration-200">
+                    <i class="bi" [ngClass]="getSocialIcon(social.platform)"></i>
+                  </a>
+                }
+              </div>
+            }
           </div>
 
           <!-- Quick Links -->
@@ -114,22 +126,22 @@ import { LanguageService } from '../../../core/services/language.service';
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span>{{ lang.currentLang() === 'ar' ? 'الرياض، المملكة العربية السعودية' : 'Riyadh, Kingdom of Saudi Arabia' }}</span>
+                <span>{{ api.companyInfo()?.location || (lang.currentLang() === 'ar' ? 'الرياض، المملكة العربية السعودية - حي الملقا' : 'Riyadh, Kingdom of Saudi Arabia') }}</span>
               </li>
               <li class="flex items-center gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#C1662F] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <a href="mailto:contact@runxtech.com" class="hover:text-[#C1662F] dir-ltr inline-block">
-                  info&#64;runxtech.com
+                <a [href]="'mailto:' + (api.companyInfo()?.email || 'info@runxtech.com')" class="hover:text-[#C1662F] dir-ltr inline-block">
+                  {{ api.companyInfo()?.email || 'info@runxtech.com' }}
                 </a>
               </li>
               <li class="flex items-center gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#C1662F] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
-                <a href="https://wa.me/966500000000" target="_blank" class="hover:text-[#C1662F] dir-ltr inline-block">
-                  +966 50 000 0000
+                <a [href]="'https://wa.me/' + (api.companyInfo()?.whatsApp || api.companyInfo()?.phone || '201148472670')" target="_blank" class="hover:text-[#C1662F] dir-ltr inline-block font-mono">
+                  {{ formatPhone(api.companyInfo()?.phone || '201148472670') }}
                 </a>
               </li>
             </ul>
@@ -152,4 +164,32 @@ import { LanguageService } from '../../../core/services/language.service';
 })
 export class FooterComponent {
   public lang = inject(LanguageService);
+  public api = inject(ApiService);
+
+  public formatPhone(raw?: string): string {
+    if (!raw) return '+20 114 847 2670';
+    const clean = raw.trim();
+    if (clean.startsWith('+')) return clean;
+    if (clean.startsWith('20') && clean.length === 12) {
+      return `+20 ${clean.substring(2, 5)} ${clean.substring(5, 8)} ${clean.substring(8)}`;
+    }
+    if (clean.startsWith('966') && clean.length >= 11) {
+      return `+966 ${clean.substring(3, 5)} ${clean.substring(5, 8)} ${clean.substring(8)}`;
+    }
+    return `+${clean}`;
+  }
+
+  public getSocialIcon(platform: string): string {
+    const p = (platform || '').toLowerCase();
+    if (p.includes('face')) return 'bi-facebook';
+    if (p.includes('link')) return 'bi-linkedin';
+    if (p.includes('insta')) return 'bi-instagram';
+    if (p.includes('twit') || p === 'x') return 'bi-twitter-x';
+    if (p.includes('whats')) return 'bi-whatsapp';
+    if (p.includes('you')) return 'bi-youtube';
+    if (p.includes('git')) return 'bi-github';
+    if (p.includes('tik')) return 'bi-tiktok';
+    if (p.includes('snap')) return 'bi-snapchat';
+    return 'bi-globe';
+  }
 }

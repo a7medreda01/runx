@@ -13,7 +13,7 @@ import { LanguageService } from '../../core/services/language.service';
 export class ContactPage {
   public lang = inject(LanguageService);
   private fb = inject(FormBuilder);
-  private apiService = inject(ApiService);
+  public api = inject(ApiService);
 
   public isSubmitting = signal<boolean>(false);
   public submittedResponse = signal<ContactSubmitResponse | null>(null);
@@ -26,6 +26,31 @@ export class ContactPage {
     message: ['', [Validators.required, Validators.minLength(10)]]
   });
 
+  public formatPhone(raw?: string): string {
+    if (!raw) return '+20 114 847 2670';
+    const clean = raw.trim();
+    if (clean.startsWith('+')) return clean;
+    if (clean.startsWith('20') && clean.length === 12) {
+      return `+20 ${clean.substring(2, 5)} ${clean.substring(5, 8)} ${clean.substring(8)}`;
+    }
+    if (clean.startsWith('966') && clean.length >= 11) {
+      return `+966 ${clean.substring(3, 5)} ${clean.substring(5, 8)} ${clean.substring(8)}`;
+    }
+    return `+${clean}`;
+  }
+
+  public getSocialIcon(platform: string): string {
+    const p = (platform || '').toLowerCase();
+    if (p.includes('face')) return 'bi-facebook';
+    if (p.includes('link')) return 'bi-linkedin';
+    if (p.includes('insta')) return 'bi-instagram';
+    if (p.includes('twit') || p === 'x') return 'bi-twitter-x';
+    if (p.includes('whats')) return 'bi-whatsapp';
+    if (p.includes('you')) return 'bi-youtube';
+    if (p.includes('git')) return 'bi-github';
+    return 'bi-globe';
+  }
+
   public onSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -34,7 +59,7 @@ export class ContactPage {
     this.isSubmitting.set(true);
     const val = this.form.value;
 
-    this.apiService.submitContact({
+    this.api.submitContact({
       name: val.name || '',
       email: val.email || '',
       phone: val.phone || '',
