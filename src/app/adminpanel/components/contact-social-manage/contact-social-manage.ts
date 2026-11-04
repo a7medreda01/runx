@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CompanyService } from '../../../Services/company.service';
 import { ContactInfoService } from '../../../Services/contact-info.service';
 import { SocialMediaService } from '../../../Services/social-media.service';
+import { ApiService } from '../../../core/services/api.service';
 import { ContactInfo, ContactInfoRequest, SocialMedia, SocialMediaRequest } from '../../../Models/api.models';
 
 @Component({
@@ -47,6 +48,7 @@ export class ContactSocialManageComponent implements OnInit {
     private companySvc: CompanyService,
     private contactInfoSvc: ContactInfoService,
     private socialMediaSvc: SocialMediaService,
+    private apiService: ApiService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -127,7 +129,16 @@ export class ContactSocialManageComponent implements OnInit {
         next: (res) => {
           if (res.succeeded) {
             this.contactSuccess = 'تم حفظ بيانات الاتصال بنجاح!';
-            this.contactInfo = res.data;
+            this.contactInfo = res.data || {
+              id: 1,
+              phone: this.phone,
+              whatsApp: this.whatsApp,
+              email: this.email,
+              address: this.address,
+              googleMapUrl: this.googleMapUrl,
+              companyId: this.companyId
+            };
+            this.apiService.loadCompanyInfo().subscribe();
           } else {
             this.contactError = res.message || 'فشل الحفظ';
           }
@@ -158,7 +169,19 @@ export class ContactSocialManageComponent implements OnInit {
       next: (res) => {
         if (res.succeeded) {
           this.contactSuccess = 'تم تحديث بيانات الاتصال بنجاح!';
-          this.contactInfo = res.data;
+          if (res.data && typeof res.data === 'object') {
+            this.contactInfo = res.data;
+          } else {
+            this.contactInfo = {
+              ...this.contactInfo!,
+              phone: this.phone,
+              whatsApp: this.whatsApp,
+              email: this.email,
+              address: this.address,
+              googleMapUrl: this.googleMapUrl
+            };
+          }
+          this.apiService.loadCompanyInfo().subscribe();
         } else {
           this.contactError = res.message || 'فشل تحديث البيانات';
         }
@@ -224,6 +247,7 @@ export class ContactSocialManageComponent implements OnInit {
             this.socialSuccess = 'تم تعديل الرابط بنجاح!';
             this.loadSocialMedia();
             this.closeSocialForm();
+            this.apiService.loadCompanyInfo().subscribe();
           } else {
             this.socialError = res.message || 'فشل التعديل';
           }
@@ -244,6 +268,7 @@ export class ContactSocialManageComponent implements OnInit {
             this.socialSuccess = 'تمت إضافة الرابط بنجاح!';
             this.loadSocialMedia();
             this.closeSocialForm();
+            this.apiService.loadCompanyInfo().subscribe();
           } else {
             this.socialError = res.message || 'فشل الإضافة';
           }
@@ -274,6 +299,7 @@ export class ContactSocialManageComponent implements OnInit {
         if (res.succeeded) {
           this.socialSuccess = 'تم حذف الرابط بنجاح!';
           this.loadSocialMedia();
+          this.apiService.loadCompanyInfo().subscribe();
         } else {
           this.socialError = res.message || 'فشل حذف الرابط';
         }
